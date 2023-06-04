@@ -1,4 +1,4 @@
-import axios from "../../technoyapi-online-b2b/node_modules/axios";
+import axios from "axios";
 
 axios.interceptors.request.use(
     function (config) {
