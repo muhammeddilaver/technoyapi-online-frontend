@@ -24,7 +24,7 @@ function LoginForm() {
             }
         },
     });
-
+    console.log(import.meta.env.VITE_BASE_ENDPOINT);
     if(user && loggedIn){
         return <Navigate to="/" />;
     }
