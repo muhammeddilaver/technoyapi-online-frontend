@@ -1,0 +1,125 @@
+
+
+
+.card-deck{
+    flex-flow: row wrap;
+    display: flex;
+}
+@media screen and (max-width: 600px) {
+	.card-deck .card {
+		width: 100%;
+	}
+  }
+
+
+.card-deck .card {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 0%;
+
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	
+	margin-bottom: 0;
+
+}
+
+.card {
+    text-align: left;
+	position: relative;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	min-width: 0;
+	word-wrap: break-word;
+	background-color: #fff;
+	background-clip: border-box;
+	border: 1px solid rgba(0,0,0,.125);
+	border-radius: .25rem;
+}
+
+.card-md {
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    padding: 20px
+}
+.flex-column {
+	-webkit-box-orient: vertical !important;
+	-webkit-box-direction: normal !important;
+	-ms-flex-direction: column !important;
+	flex-direction: column !important;
+}
+
+.d-flex {
+	display: -webkit-box !important;
+	display: -ms-flexbox !important;
+	display: flex !important;
+}
+
+.mt-auto, .my-auto {
+	margin-top: auto !important;
+}
+
+.card-body {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	padding: 1.25rem;
+}
+
+.image-md {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-md img {
+    margin-top: 10px;
+    width: 150px;
+}
+
+.price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center
+}
+
+.qty {
+    display: flex;
+    height: 30px;
+    margin-bottom: 12px;
+    width: 80px;
+    border: 1px solid #eeeeee;
+    border-radius: 20px;
+    justify-content: center;
+    align-items: center
+}
+
+.qty p {
+    padding: 0 11px;
+    font-weight: 700;
+    font-size: 20px;
+    margin-top: 20px
+}
+
+.qty i {
+    margin-top: 4px;
+    cursor: pointer;
+    transition: all 0.5s
+}
+
+.description {
+    margin-top: 10px
+}
+
+.description p {
+    font-size: 11px
+}
