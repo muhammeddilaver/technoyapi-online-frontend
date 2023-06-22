@@ -19,7 +19,7 @@ import { useBasket } from "../contexts/BasketContext";
 import { useToast } from "../contexts/ToastContext";
 
 export default function Root() {
-    const { loggedIn, logout, user } = useAuth();
+    const { logout, user } = useAuth();
     const { items } = useBasket();
     const { showToast, toastInfo, setshowToast } = useToast();
 
@@ -96,7 +96,6 @@ export default function Root() {
                                     </NavLink>
                                     <NavLink
                                         className="nav-link"
-                                        aria-controls={`offcanvasNavbar-expand-md`}
                                         to="/orders"
                                     >
                                         Siparişler

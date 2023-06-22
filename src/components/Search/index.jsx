@@ -26,7 +26,7 @@ function Search() {
                     <i className="fa fa-search"></i> Ara
                 </Button>
             </InputGroup>
-            <SearchList keyword={keyword} />
+            <SearchList keyword={keyword} setkeyword={setkeyword} />
         </>
     );
 }

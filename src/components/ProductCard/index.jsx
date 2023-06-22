@@ -1,8 +1,9 @@
-import { Button, Card, Col, Image } from "react-bootstrap";
+import { Button, Card, Image } from "react-bootstrap";
 import PropTypes from "prop-types";
 import "./style.css";
 import { useState } from "react";
 import { useBasket } from "../../contexts/BasketContext";
+import { format } from "number-currency-format-2";
 
 function ProductCard({ item }) {
     const [piece, setpiece] = useState(1);
@@ -37,7 +38,14 @@ function ProductCard({ item }) {
                     <p>{item.description}</p>
                 </div>
                 <div className="price mt-auto">
-                    <h5>{item.price} ₺</h5>
+{/*                     <h5>
+                        {format(item.price, {
+                            showDecimals: "IF_NEEDED",
+                            currency: "₺",
+                            decimalSeparator: ",",
+                            thousandSeparator: ".",
+                        })}
+                    </h5> */}
                     <div className="qty">
                         <i onClick={DecBag} className="fa fa-minus"></i>
                         <p>{piece}</p>

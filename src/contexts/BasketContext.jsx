@@ -1,5 +1,4 @@
 import { useState, createContext, useContext, useEffect } from "react";
-import { fetchCreateOrder } from "../api";
 
 const BasketContext = createContext();
 
@@ -12,21 +11,9 @@ const BasketProvider = ({ children }) => {
         localStorage.setItem("basket", JSON.stringify(items));
     }, [items]);
 
-    const order = async (description) => {
-        try {
-            await fetchCreateOrder(
-                items,
-                description === "" ? " " : description
-            );
-            setitems([]);
-            return true;
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     const isInBasket = (data) => {
-        return items.find((item) => item._id === data._id) === undefined
+        return items.find((item) => item.name === data.name) === undefined
             ? false
             : true;
     };
@@ -38,8 +25,8 @@ const BasketProvider = ({ children }) => {
         }
     };
 
-    const delFromBasket = (id) => {
-        setitems((prevItems) => prevItems.filter((item) => item._id !== id));
+    const delFromBasket = (name) => {
+        setitems((prevItems) => prevItems.filter((item) => item.name !== name));
     };
 
     const changePieceFromBasket = (id, key, piece) => {
@@ -61,7 +48,6 @@ const BasketProvider = ({ children }) => {
         delFromBasket,
         changePieceFromBasket,
         isInBasket,
-        order,
     };
 
     return (
