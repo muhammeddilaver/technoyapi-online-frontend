@@ -3,7 +3,7 @@ import { fetchOrdersList } from "../api";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { Container, Table } from "react-bootstrap";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { format } from "number-currency-format-2";
 
@@ -22,6 +22,8 @@ export const loader = (queryClient) => async () => {
 
 function Orders() {
     const { ref, inView } = useInView();
+
+    const navigate = useNavigate();
 
     const initialData = useLoaderData();
 
@@ -56,6 +58,10 @@ function Orders() {
 
     if (status === "error") return "Sipariş bulunamadı.";
 
+    const handleRowClick = (order) => {
+        navigate(`/orders/${order._id}`);
+    };
+
     const orderStatusMessage = (status) => {
         switch (status) {
             case 1:
@@ -77,7 +83,7 @@ function Orders() {
 
     return (
         <Container className="">
-            <Table striped responsive bordered hover>
+            <Table responsive bordered hover>
                 <thead>
                     <tr>
                         <th>Sipariş Tarihi</th>
@@ -85,7 +91,7 @@ function Orders() {
                         <th>Tutar</th>
                         <th>Açıklama</th>
                         <th>Teslimat Tarihi</th>
-                        <th>Durum</th>
+                        <th>Durum</th>  
                         <th></th>
                     </tr>
                 </thead>
@@ -93,7 +99,7 @@ function Orders() {
                     {data.pages.map((page, pageIndex) => (
                         <React.Fragment key={pageIndex}>
                             {page.map((order, orderIndex) => (
-                                <tr
+                                <tr onClick={() => handleRowClick(order)}
                                     className={
                                         order.status === 7
                                             ? "table-danger"
@@ -122,7 +128,7 @@ function Orders() {
                                             })}
                                         </td>
                                     ) : (
-                                        <td>Fiyat onayı bekleniyor...</td>
+                                        <td>Onay bekleniyor...</td>
                                     )}
 
                                     <td>{order.description}</td>

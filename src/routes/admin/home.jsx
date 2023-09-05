@@ -1,12 +1,11 @@
-import { Container, Table } from "react-bootstrap";
-import AdminNavbar from "../../components/Admin/AdminNavbar";
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Button, Container, Table } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { format } from "number-currency-format-2";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchOrdersListAdmin } from "../../api";
+import React, { useEffect } from "react";
 /* import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import tr from "date-fns/locale/tr";
@@ -21,7 +20,9 @@ registerLocale("tr", tr);
  */
 function AdminHome() {
     const { ref, inView } = useInView();
-    
+
+    const navigate = useNavigate();
+
     const {
         data,
         error,
@@ -53,6 +54,10 @@ function AdminHome() {
 
     if (status === "error") return "Sipariş bulunamadı.";
 
+    const handleRowClick = (order) => {
+        navigate(`/admin/${order._id}`);
+    };
+
     const orderStatusMessage = (status) => {
         switch (status) {
             case 1:
@@ -75,6 +80,10 @@ function AdminHome() {
     return (
         <>
             <Container style={{ marginTop: 80 }}>
+                <div className="d-flex justify-content-end mb-3">
+                    <Link to="/admin/new_order"><Button>Yeni Sipariş</Button></Link>
+                </div>
+
                 <Table responsive bordered>
                     <thead>
                         <tr>
@@ -93,6 +102,7 @@ function AdminHome() {
                             <React.Fragment key={pageIndex}>
                                 {page.map((order, orderIndex) => (
                                     <tr
+                                        onClick={() => handleRowClick(order)}
                                         className={
                                             order.status === 7
                                                 ? "table-danger"

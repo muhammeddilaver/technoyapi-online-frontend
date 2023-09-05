@@ -6,21 +6,10 @@ import { useBasket } from "../../contexts/BasketContext";
 import { format } from "number-currency-format-2";
 
 function ProductCard({ item }) {
-    const [piece, setpiece] = useState(1);
     const { addToBasket, isInBasket } = useBasket();
 
     const Add = () => {
-        addToBasket(item, piece);
-    };
-
-    const UpBag = () => {
-        setpiece(piece + 1);
-    };
-
-    const DecBag = () => {
-        if (piece >= 1) {
-            setpiece(piece - 1);
-        }
+        addToBasket(item, 1);
     };
 
     return (
@@ -34,9 +23,9 @@ function ProductCard({ item }) {
             <div className="text card-body d-flex flex-column">
                 <h6>{item.brand}</h6>
                 <h5>{item.name}</h5>
-                <div className="description">
+                {/* <div className="description">
                     <p>{item.description}</p>
-                </div>
+                </div> */}
                 <div className="price mt-auto">
 {/*                     <h5>
                         {format(item.price, {
@@ -46,11 +35,6 @@ function ProductCard({ item }) {
                             thousandSeparator: ".",
                         })}
                     </h5> */}
-                    <div className="qty">
-                        <i onClick={DecBag} className="fa fa-minus"></i>
-                        <p>{piece}</p>
-                        <i onClick={UpBag} className="fa fa-plus"></i>
-                    </div>
                 </div>
                 <Button
                     className="mt-auto"
@@ -67,9 +51,9 @@ function ProductCard({ item }) {
 ProductCard.propTypes = {
     item: PropTypes.shape({
         name: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired,
+        /* description: PropTypes.string.isRequired, */
         brand: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
+        /* price: PropTypes.number.isRequired, */
     }).isRequired,
 };
 

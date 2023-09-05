@@ -30,13 +30,15 @@ const BasketProvider = ({ children }) => {
     };
 
     const changePieceFromBasket = (id, key, piece) => {
-        const value = key === "up" ? 1 : -1;
-        if (value === -1 && piece === 1) {
-            delFromBasket(id);
+        if(piece === ""){
+            piece = 0;
         }
+
+        piece = parseFloat(piece);
+
         setitems((prevItems) =>
             prevItems.map((item) =>
-                item._id === id ? { ...item, piece: item.piece + value } : item
+                item._id === id ? { ...item, piece: piece } : item
             )
         );
     };

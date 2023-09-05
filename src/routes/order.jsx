@@ -46,7 +46,7 @@ function Order() {
     if (isError) {
         return <div>Sipariş bulunamadı</div>;
     }
-
+    
     const orderStatusMessage = (status) => {
         switch (status) {
             case 1:
@@ -152,10 +152,10 @@ function Order() {
                                         ) : (
                                             <>
                                                 <td>
-                                                    Fiyat onayı bekleniyor...
+                                                    Onay bekleniyor...
                                                 </td>
                                                 <td>
-                                                    Fiyat onayı bekleniyor...
+                                                    Onay bekleniyor...
                                                 </td>
                                             </>
                                         )}
@@ -188,7 +188,7 @@ function Order() {
                             <tr>
                                 <td></td>
                                 <td></td>
-                                <td>Toplam tutar:</td>
+                                <td><b>Toplam tutar:</b></td>
                                 <td>
                                     {format(data[0].total_price, {
                                         currency: "₺",
@@ -208,10 +208,12 @@ function Order() {
                         </p>
                         <Table striped responsive bordered hover>
                             <thead>
-                                <th>Ürün Adı</th>
-                                <th>Adet</th>
-                                <th>Fiyat</th>
-                                <th>Tutar</th>
+                                <tr>
+                                    <th>Ürün Adı</th>
+                                    <th>Adet</th>
+                                    <th>Fiyat</th>
+                                    <th>Tutar</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 {data[0].products.map(
@@ -220,10 +222,25 @@ function Order() {
                                             <tr key={key}>
                                                 <td>{product.name}</td>
                                                 <td>{product.return}</td>
-                                                <td>{product.price}</td>
                                                 <td>
-                                                    {product.price *
-                                                        product.return}
+                                                    {format(product.price, {
+                                                        currency: "₺",
+                                                        decimalSeparator: ",",
+                                                        thousandSeparator: ".",
+                                                    })}
+                                                </td>
+                                                <td>
+                                                    {format(
+                                                        product.price *
+                                                            product.return,
+                                                        {
+                                                            currency: "₺",
+                                                            decimalSeparator:
+                                                                ",",
+                                                            thousandSeparator:
+                                                                ".",
+                                                        }
+                                                    )}
                                                 </td>
                                             </tr>
                                         )

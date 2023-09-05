@@ -19,6 +19,15 @@ axios.interceptors.request.use(
     }
 );
 
+export const currencyRates = async () => {
+    const { data } = await axios.get(
+        `https://api.bigpara.hurriyet.com.tr/doviz/headerlist/anasayfa`
+    );
+    const dolar = data.data.find(item => item.SEMBOLID === 1302).SATIS;
+    const euro = data.data.find(item => item.SEMBOLID === 1639).SATIS;
+    return {dolar, euro};
+}
+
 export const acceptOrRejectOffer = async ({status, orderId}) => {
     const dataForm = {
         status: status
@@ -71,6 +80,20 @@ export const updateOrder = async (order) => {
     const { data } = await axios.put(
         `${import.meta.env.VITE_BASE_ENDPOINT}/order/${order._id}`,
         order
+    );
+    return data;
+};
+
+export const getBalance = async () => {
+    const { data } = await axios.get(
+        `${import.meta.env.VITE_BASE_ENDPOINT}/auth/balance`
+    );
+    return data;
+};
+
+export const fetchAccount = async () => {
+    const { data } = await axios.get(
+        `${import.meta.env.VITE_BASE_ENDPOINT}/auth/summary`
     );
     return data;
 };

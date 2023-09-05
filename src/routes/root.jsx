@@ -100,6 +100,12 @@ export default function Root() {
                                     >
                                         Siparişler
                                     </NavLink>
+                                    <NavLink
+                                        className="nav-link"
+                                        to="/account"
+                                    >
+                                        Hesap Dökümü
+                                    </NavLink>
                                 </Nav>
 
                                 <Nav className="justify-content-end flex-grow-1 pe-3">

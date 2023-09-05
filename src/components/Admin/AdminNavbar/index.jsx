@@ -34,7 +34,7 @@ function AdminNavbar() {
                 className="mb-3"
             >
                 <Container fluid>
-                    <NavLink className="navbar-brand" to="/">
+                    <NavLink className="navbar-brand" to="/admin">
                         Techno Yapı Online
                     </NavLink>
                     <Navbar.Toggle
@@ -57,7 +57,7 @@ function AdminNavbar() {
                         </Offcanvas.Header>
                         <Offcanvas.Body>
                             <Nav className="justify-content-start flex-grow-1 pe-3">
-                                <NavLink className="nav-link" to="/admin/orders">
+                                <NavLink className="nav-link" to="/admin/">
                                     Siparişler
                                 </NavLink>
                                 <NavLink className="nav-link" to="/admin/users">

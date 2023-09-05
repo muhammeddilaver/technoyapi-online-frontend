@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, CloseButton, Form, Table } from "react-bootstrap";
+import { Button, CloseButton, Container, Form, Table } from "react-bootstrap";
 import { useBasket } from "../../contexts/BasketContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -38,7 +38,7 @@ function BasketNavbar({ handleClose }) {
     }, [items]); */
 
     return (
-        <>
+        <Container>
             <Table striped bordered hover size="sm" responsive>
                 <thead>
                     <tr>
@@ -51,33 +51,9 @@ function BasketNavbar({ handleClose }) {
                 <tbody>
                     {items.map((item, key) => (
                         <tr key={key}>
-                            <td>{key + 1}</td>
+                            <td style={{width:40}}>{key + 1}</td>
                             <td className="text-nowrap">{item.name}</td>
-                            <td>
-                                <div className="qty" style={{ height: 20 }}>
-                                    <i
-                                        onClick={() =>
-                                            changePieceFromBasket(
-                                                item._id,
-                                                "down",
-                                                item.piece
-                                            )
-                                        }
-                                        className="fa fa-minus"
-                                    ></i>
-                                    <p style={{ fontSize: 19 }}>{item.piece}</p>
-                                    <i
-                                        onClick={() =>
-                                            changePieceFromBasket(
-                                                item._id,
-                                                "up",
-                                                item.piece
-                                            )
-                                        }
-                                        className="fa fa-plus"
-                                    ></i>
-                                </div>
-                            </td>
+                            <td style={{width:120}}><Form.Control type="number" onChange={(e) => changePieceFromBasket(item._id, 1, e.target.value)} value={item.piece}/></td>
                             {/* <td className="text-nowrap">
                                 {format(item.price, {
                                     currency: "₺",
@@ -85,25 +61,25 @@ function BasketNavbar({ handleClose }) {
                                     thousandSeparator: ".",
                                 })}
                             </td> */}
-                            <td>
+                            <td style={{width:30}}>
                                 <CloseButton
                                     onClick={() => delFromBasket(item.name)}
                                 />
                             </td>
                         </tr>
                     ))}
-                    <tr>
+                    {/* <tr>
                         <td></td>
                         <td></td>
-                        {/* <td>Toplam tutar:</td>
+                        <td>Toplam tutar:</td>
                         <td className="text-nowrap">
                             {format(totalPrice, {
                                 currency: "₺",
                                 decimalSeparator: ",",
                                 thousandSeparator: ".",
                             })}
-                        </td> */}
-                    </tr>
+                        </td>
+                    </tr> */}
                 </tbody>
             </Table>
             <Form.Group
@@ -133,7 +109,7 @@ function BasketNavbar({ handleClose }) {
                 Teklif İste
             </Button>
             <Button onClick={() => console.log(items)}>Test</Button>
-        </>
+        </Container>
     );
 }
 
