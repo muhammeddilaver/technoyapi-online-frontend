@@ -20,6 +20,8 @@ import AdminRoutes from "./utils/AdminRoutes.jsx";
 import OrderAdmin from "./routes/admin/order.jsx";
 import Account from "./routes/account.jsx";
 import NewOrder from "./routes/admin/neworder.jsx";
+import Users from "./routes/admin/users.jsx";
+import UserAccount from "./routes/admin/userAccount.jsx";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -75,12 +77,20 @@ const router = createBrowserRouter([
                 element: <AdminHome />,
             },
             {
+                path: "/admin/users",
+                element: <Users />,
+            },
+            {
                 path: "/admin/:order_id",
                 element: <OrderAdmin />,
             },
             {
                 path: "/admin/new_order",
                 element: <NewOrder />,
+            },
+            {
+                path: "/admin/user/:user_id/account",
+                element: <UserAccount />,
             },
         ],
     },

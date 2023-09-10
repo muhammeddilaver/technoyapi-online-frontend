@@ -90,13 +90,17 @@ function OrderAdmin() {
 
     useEffect(() => {
         if (formik.values.products && formik.values.products.length > 0) {
-            settotalPrice(
-                formik.values.products.reduce(
-                    (total, values) => total + values.price * values.piece,
-                    0
-                )
-            );
-            formik.values.total_price = totalPrice;
+            // Filter out elements with return: false
+            const filteredProducts = formik.values.products.filter(product => product.return !== false);
+            
+            // Calculate the total price for the filtered products
+            const total = filteredProducts.reduce((total, product) => total + product.price * product.piece, 0);
+    
+            // Update the total_price in the formik.values
+            formik.setFieldValue("total_price", total);
+    
+            // You may want to update the state variable as well if needed
+            settotalPrice(total);
         }
     }, [formik.values.products]);
 
@@ -294,8 +298,8 @@ function OrderAdmin() {
                                     </>
                                 )}
 
-                                <th className="col-lg-2">Fiyat</th>
-                                <th className="col-lg-2">Tutar</th>
+                                <th className="col-lg-2">Fiyat (TL)</th>
+                                <th className="col-lg-2">Tutar (TL)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -375,7 +379,6 @@ function OrderAdmin() {
                                                                 true
                                                             }
                                                             type="text"
-                                                            min={1}
                                                             name={`products.${key}.exact_price`}
                                                             onChange={(
                                                                 event
@@ -879,7 +882,7 @@ function OrderAdmin() {
 
                                 <td></td>
                                 <td></td>
-                                <td>Toplam tutar:</td>
+                                <td>Toplam tutar (TL):</td>
                                 <td>
                                     <Form.Control
                                         disabled
@@ -912,8 +915,8 @@ function OrderAdmin() {
                                     <tr>
                                         <th>Ürün Adı</th>
                                         <th>Adet</th>
-                                        <th>Fiyat</th>
-                                        <th>Tutar</th>
+                                        <th>Fiyat (TL)</th>
+                                        <th>Tutar (TL)</th>
                                     </tr>
                                 </thead>
                                 <tbody>

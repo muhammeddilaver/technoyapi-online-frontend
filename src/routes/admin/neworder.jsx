@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+    createAdminOrder,
     currencyRates,
     fetchSearchList,
     fetchSearchUsersAdmin,
@@ -8,8 +9,12 @@ import { useEffect, useState } from "react";
 import { Button, Container, Form, Row, Table } from "react-bootstrap";
 import { useFormik } from "formik";
 import Select, { components } from "react-select";
+import { useToast } from "../../contexts/ToastContext";
+import { useNavigate } from "react-router-dom";
 
 function NewOrder() {
+    const { createToast } = useToast();
+    const navigate = useNavigate();
     const [userKeyword, setuserKeyword] = useState("");
     const [productKeyword, setproductKeyword] = useState("");
     const [dolar, setDolar] = useState(null);
@@ -23,6 +28,20 @@ function NewOrder() {
         ["order", productKeyword],
         fetchSearchList
     );
+
+    const queryClient = useQueryClient();
+
+    const newOrderMutation = useMutation(createAdminOrder, {
+        onSuccess: () => {
+            //queryClient.invalidateQueries(["order", order_id]);
+            queryClient.refetchQueries(["orderList"]);
+            createToast({
+                title: "Bilgi",
+                text: "İşlem başarılı.",
+            });
+            navigate("/admin");
+        },
+    });
 
     const getCurrency = async () => {
         const { dolar, euro } = await currencyRates();
@@ -39,9 +58,10 @@ function NewOrder() {
             products: [],
             description: "",
             user_id: "",
+            status: 4,
         },
         onSubmit: async (values, bag) => {
-            console.log(values);
+            newOrderMutation.mutate(values);
         },
     });
 
@@ -111,6 +131,7 @@ function NewOrder() {
             ...formik.values.products,
             {
                 exact_price: 0,
+                currency: "TL",
                 factor: 0,
                 inventory: 1000,
                 name: name,
@@ -145,33 +166,44 @@ function NewOrder() {
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
-                <Form.Group className="mb-3">
-                    <Form.Label>Firma:</Form.Label>
-                    <Select
-                        onChange={handleUserSearchChange}
-                        onInputChange={handleUserInputChange}
-                        options={userOptions}
-                        placeholder="Siparişi veren firma bilgileri."
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Ürün Ekle:</Form.Label>
-                    <Select
-                        value={productKeyword}
-                        components={{ NoOptionsMessage }}
-                        styles={{
-                            noOptionsMessage: (base) => ({
-                                ...base,
-                                ...msgStyles,
-                            }),
-                        }}
-                        onChange={handleProductSearchChange}
-                        onInputChange={handleProductInputChange}
-                        options={productOptions}
-                        placeholder="Eklemek istediğiniz ürünü giriniz."
-                    />
-                </Form.Group>
                 <form onSubmit={formik.handleSubmit}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>İşlem Tipi:</Form.Label>
+                        <Form.Select
+                            name={`status`}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                        >
+                            <option value={4}>Sipariş Al</option>
+                            <option value={2}>Teklif ver.</option>
+                        </Form.Select>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Firma:</Form.Label>
+                        <Select
+                            onChange={handleUserSearchChange}
+                            onInputChange={handleUserInputChange}
+                            options={userOptions}
+                            placeholder="Siparişi veren firma bilgileri."
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Ürün Ekle:</Form.Label>
+                        <Select
+                            value={productKeyword}
+                            components={{ NoOptionsMessage }}
+                            styles={{
+                                noOptionsMessage: (base) => ({
+                                    ...base,
+                                    ...msgStyles,
+                                }),
+                            }}
+                            onChange={handleProductSearchChange}
+                            onInputChange={handleProductInputChange}
+                            options={productOptions}
+                            placeholder="Eklemek istediğiniz ürünü giriniz."
+                        />
+                    </Form.Group>
                     <Table
                         striped
                         responsive
@@ -186,8 +218,8 @@ function NewOrder() {
                                 <th className="col-lg-2">Ham Fiyat</th>
                                 <th className="col-lg-2">Para Birimi</th>
                                 <th className="col-lg-2">Çarpan</th>
-                                <th className="col-lg-2">Fiyat</th>
-                                <th className="col-lg-2">Tutar</th>
+                                <th className="col-lg-2">Fiyat (TL)</th>
+                                <th className="col-lg-2">Tutar (TL)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -214,8 +246,7 @@ function NewOrder() {
                                         }}
                                     >
                                         <Form.Control
-                                            type="number"
-                                            min={1}
+                                            type="text"
                                             name={`products.${key}.exact_price`}
                                             onChange={(event) => {
                                                 formik.handleChange(event);
@@ -471,44 +502,34 @@ function NewOrder() {
                                                     formik.values.products?.[
                                                         key
                                                     ]?.exact_price
-                                                ) * (formik
-                                                    .values
-                                                    .products?.[
-                                                    key
-                                                ]
-                                                    ?.currency ===
-                                                "DOLAR"
-                                                    ? dolar
-                                                    : formik
-                                                          .values
-                                                          .products?.[
-                                                          key
-                                                      ]
-                                                          ?.currency ===
-                                                      "EURO"
-                                                    ? euro
-                                                    : 1) || 0) +
+                                                ) *
+                                                    (formik.values.products?.[
+                                                        key
+                                                    ]?.currency === "DOLAR"
+                                                        ? dolar
+                                                        : formik.values
+                                                              .products?.[key]
+                                                              ?.currency ===
+                                                          "EURO"
+                                                        ? euro
+                                                        : 1) || 0) +
                                                     ((parseFloat(
                                                         formik.values
                                                             .products?.[key]
                                                             ?.exact_price
-                                                    ) * (formik
-                                                        .values
-                                                        .products?.[
-                                                        key
-                                                    ]
-                                                        ?.currency ===
-                                                    "DOLAR"
-                                                        ? dolar
-                                                        : formik
-                                                              .values
-                                                              .products?.[
-                                                              key
-                                                          ]
-                                                              ?.currency ===
-                                                          "EURO"
-                                                        ? euro
-                                                        : 1) || 0) *
+                                                    ) *
+                                                        (formik.values
+                                                            .products?.[key]
+                                                            ?.currency ===
+                                                        "DOLAR"
+                                                            ? dolar
+                                                            : formik.values
+                                                                  .products?.[
+                                                                  key
+                                                              ]?.currency ===
+                                                              "EURO"
+                                                            ? euro
+                                                            : 1) || 0) *
                                                         parseFloat(
                                                             formik.values
                                                                 .products?.[key]
@@ -530,44 +551,34 @@ function NewOrder() {
                                                     formik.values.products?.[
                                                         key
                                                     ]?.exact_price
-                                                ) * (formik
-                                                    .values
-                                                    .products?.[
-                                                    key
-                                                ]
-                                                    ?.currency ===
-                                                "DOLAR"
-                                                    ? dolar
-                                                    : formik
-                                                          .values
-                                                          .products?.[
-                                                          key
-                                                      ]
-                                                          ?.currency ===
-                                                      "EURO"
-                                                    ? euro
-                                                    : 1) +
+                                                ) *
+                                                    (formik.values.products?.[
+                                                        key
+                                                    ]?.currency === "DOLAR"
+                                                        ? dolar
+                                                        : formik.values
+                                                              .products?.[key]
+                                                              ?.currency ===
+                                                          "EURO"
+                                                        ? euro
+                                                        : 1) +
                                                     (parseFloat(
                                                         formik.values
                                                             .products?.[key]
                                                             ?.exact_price
-                                                    ) * (formik
-                                                        .values
-                                                        .products?.[
-                                                        key
-                                                    ]
-                                                        ?.currency ===
-                                                    "DOLAR"
-                                                        ? dolar
-                                                        : formik
-                                                              .values
-                                                              .products?.[
-                                                              key
-                                                          ]
-                                                              ?.currency ===
-                                                          "EURO"
-                                                        ? euro
-                                                        : 1) *
+                                                    ) *
+                                                        (formik.values
+                                                            .products?.[key]
+                                                            ?.currency ===
+                                                        "DOLAR"
+                                                            ? dolar
+                                                            : formik.values
+                                                                  .products?.[
+                                                                  key
+                                                              ]?.currency ===
+                                                              "EURO"
+                                                            ? euro
+                                                            : 1) *
                                                         parseFloat(
                                                             formik.values
                                                                 .products?.[key]
@@ -608,7 +619,7 @@ function NewOrder() {
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td>Toplam tutar:</td>
+                                <td>Toplam tutar (TL):</td>
                                 <td>
                                     <Form.Control
                                         disabled
@@ -633,9 +644,7 @@ function NewOrder() {
                         ></Form.Control>
                     </Form.Group>
                     <Button type="submit">Sipariş Oluştur</Button>
-                    <Button onClick={() => console.log(formik.values)}>
-                        test
-                    </Button>
+                    <Button onClick={() => console.log(formik.values)}>Test</Button>
                 </form>
             </Row>
         </Container>

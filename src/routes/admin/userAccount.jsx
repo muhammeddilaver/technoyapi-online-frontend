@@ -1,16 +1,23 @@
 import { Alert, Container, Row } from "react-bootstrap";
 import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
-import { fetchAccount, getBalance } from "../api";
+import { fetchAccount, getBalance, userFetch } from "../../api";
 import { format } from "number-currency-format-2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Table } from "antd";
 
-function Account() {
+function UserAccount() {
     const navigate = useNavigate();
 
-    const { isLoading, isError, data, error } = useQuery(["account"], () =>
-        fetchAccount()
+    const { user_id } = useParams();
+
+    const { isLoading, isError, data, error } = useQuery(
+        ["account", user_id],
+        () => fetchAccount(user_id)
+    );
+
+    const { data: userData } = useQuery(["user", user_id], () =>
+        userFetch(user_id)
     );
 
     const {
@@ -18,7 +25,7 @@ function Account() {
         isError: balanceIsError,
         data: balanceData,
         error: balanceError,
-    } = useQuery(["balance"], () => getBalance());
+    } = useQuery(["balance"], () => getBalance(user_id));
 
     if (isLoading || balanceIsLoading) {
         return <div>Yükleniyor...</div>;
@@ -92,12 +99,13 @@ function Account() {
         <Container style={{ marginTop: 80 }}>
             <Row>
                 <h2>Hesap Dökümü</h2>
+				<h3>{userData.name + " - " + userData.company_name}</h3>
                 <Table
                     onRow={(record) => {
                         return {
                             onClick: () => {
                                 record.delivery_date &&
-                                    navigate(`/orders/${record._id}`);
+                                    navigate(`/admin/${record._id}`);
                             }, // click row
                         };
                     }}
@@ -134,4 +142,4 @@ function Account() {
     );
 }
 
-export default Account;
+export default UserAccount;
