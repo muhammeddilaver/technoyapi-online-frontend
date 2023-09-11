@@ -242,7 +242,7 @@ function NewOrder() {
                                     </td>
                                     <td
                                         style={{
-                                            width: 110,
+                                            width: 130,
                                         }}
                                     >
                                         <Form.Control
@@ -490,7 +490,7 @@ function NewOrder() {
                                         />
                                     </td>
 
-                                    <td style={{ width: 120 }}>
+                                    <td style={{ width: 130 }}>
                                         <Form.Control
                                             disabled
                                             type="number"
@@ -539,7 +539,7 @@ function NewOrder() {
                                             }
                                         />
                                     </td>
-                                    <td style={{ width: 120 }}>
+                                    <td style={{ width: 160 }}>
                                         <Form.Control
                                             disabled
                                             type="number"
