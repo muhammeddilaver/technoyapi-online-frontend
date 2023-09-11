@@ -185,11 +185,7 @@ function Users() {
                         name="vno"
                         rules={[
                             {
-                                message:
-                                    "Lütfen müşterinin vergi numarasını giriniz!",
-                            },
-                            {
-                                type: "number",
+                                pattern: new RegExp(/^[0-9]+$/),
                                 message: "Vergi numarası sadece sayılardan oluşabilir."
                             }
                         ]}
