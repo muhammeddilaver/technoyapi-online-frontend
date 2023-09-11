@@ -644,7 +644,7 @@ function NewOrder() {
                         ></Form.Control>
                     </Form.Group>
                     <Button type="submit">Sipariş Oluştur</Button>
-                    <Button onClick={() => console.log(formik.values)}>Test</Button>
+                    {/* <Button onClick={() => console.log(formik.values)}>Test</Button> */}
                 </form>
             </Row>
         </Container>

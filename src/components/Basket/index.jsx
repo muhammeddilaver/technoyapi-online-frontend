@@ -108,7 +108,7 @@ function BasketNavbar({ handleClose }) {
             >
                 Teklif İste
             </Button>
-            <Button onClick={() => console.log(items)}>Test</Button>
+            {/* <Button onClick={() => console.log(items)}>Test</Button> */}
         </Container>
     );
 }
