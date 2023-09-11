@@ -227,7 +227,7 @@ function NewOrder() {
                             {formik.values.products.map((product, key) => (
                                 <tr key={key}>
                                     <td>{product.name}</td>
-                                    <td style={{ width: 110 }}>
+                                    <td style={{ width: 120 }}>
                                         <Form.Control
                                             type="number"
                                             name={`products.${key}.piece`}
@@ -242,7 +242,7 @@ function NewOrder() {
                                     </td>
                                     <td
                                         style={{
-                                            width: 130,
+                                            width: 140,
                                         }}
                                     >
                                         <Form.Control
@@ -490,7 +490,7 @@ function NewOrder() {
                                         />
                                     </td>
 
-                                    <td style={{ width: 130 }}>
+                                    <td style={{ width: 140 }}>
                                         <Form.Control
                                             disabled
                                             type="number"
@@ -539,7 +539,7 @@ function NewOrder() {
                                             }
                                         />
                                     </td>
-                                    <td style={{ width: 160 }}>
+                                    <td style={{ width: 180 }}>
                                         <Form.Control
                                             disabled
                                             type="number"
