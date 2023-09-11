@@ -227,7 +227,7 @@ function NewOrder() {
                             {formik.values.products.map((product, key) => (
                                 <tr key={key}>
                                     <td>{product.name}</td>
-                                    <td style={{ width: 40 }}>
+                                    <td style={{ width: 110 }}>
                                         <Form.Control
                                             type="number"
                                             name={`products.${key}.piece`}
@@ -299,7 +299,7 @@ function NewOrder() {
                                     </td>
                                     <td
                                         style={{
-                                            width: 80,
+                                            width: 120,
                                         }}
                                     >
                                         <Form.Select
@@ -382,7 +382,7 @@ function NewOrder() {
                                     </td>
                                     <td
                                         style={{
-                                            width: 110,
+                                            width: 90,
                                         }}
                                     >
                                         <Form.Control
@@ -490,7 +490,7 @@ function NewOrder() {
                                         />
                                     </td>
 
-                                    <td style={{ width: 110 }}>
+                                    <td style={{ width: 120 }}>
                                         <Form.Control
                                             disabled
                                             type="number"
@@ -539,7 +539,7 @@ function NewOrder() {
                                             }
                                         />
                                     </td>
-                                    <td style={{ width: 110 }}>
+                                    <td style={{ width: 120 }}>
                                         <Form.Control
                                             disabled
                                             type="number"
