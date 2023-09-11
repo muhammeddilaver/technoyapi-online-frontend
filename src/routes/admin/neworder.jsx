@@ -209,7 +209,7 @@ function NewOrder() {
                         responsive
                         bordered
                         hover
-                        style={{ minWidth: 800 }}
+                        style={{ minWidth: 900 }}
                     >
                         <thead>
                             <tr>
