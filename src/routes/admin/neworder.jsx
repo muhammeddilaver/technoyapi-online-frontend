@@ -214,12 +214,12 @@ function NewOrder() {
                         <thead>
                             <tr>
                                 <th style={{ minWidth: 250 }}>Ürün Adı</th>
-                                <th className="col-lg-3">Adet</th>
-                                <th className="col-lg-3">Ham Fiyat</th>
-                                <th className="col-lg-3">Para Birimi</th>
-                                <th className="col-lg-3">Çarpan</th>
-                                <th className="col-lg-3">Fiyat (TL)</th>
-                                <th className="col-lg-3">Tutar (TL)</th>
+                                <th className="col-lg-2">Adet</th>
+                                <th className="col-lg-2">Ham Fiyat</th>
+                                <th className="col-lg-2">Para Birimi</th>
+                                <th className="col-lg-2">Çarpan</th>
+                                <th className="col-lg-2">Fiyat (TL)</th>
+                                <th className="col-lg-2">Tutar (TL)</th>
                                 <th></th>
                             </tr>
                         </thead>
