@@ -55,7 +55,7 @@ export default function Root() {
                 >
                     <Container fluid>
                         <NavLink className="navbar-brand" to="/">
-                            Techno Yapı Online
+                            Techno Yapı
                         </NavLink>
                         <Nav className="d-md-none justify-content-start flex-grow-1 pe-3">
                             {items.length != 0 && (
@@ -86,7 +86,7 @@ export default function Root() {
                                 <Offcanvas.Title
                                     id={`offcanvasNavbarLabel-expand-md`}
                                 >
-                                    Techno Yapı Online
+                                    Techno Yapı
                                 </Offcanvas.Title>
                             </Offcanvas.Header>
                             <Offcanvas.Body>
