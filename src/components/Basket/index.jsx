@@ -27,7 +27,7 @@ function BasketNavbar({ handleClose }) {
             });
         },
     });
-    
+
     /* useEffect(() => {
         settotalPrice(0);
         items.map((item) => {
@@ -51,9 +51,21 @@ function BasketNavbar({ handleClose }) {
                 <tbody>
                     {items.map((item, key) => (
                         <tr key={key}>
-                            <td style={{width:40}}>{key + 1}</td>
+                            <td style={{ width: 40 }}>{key + 1}</td>
                             <td className="text-nowrap">{item.name}</td>
-                            <td style={{width:120}}><Form.Control type="number" onChange={(e) => changePieceFromBasket(item._id, 1, e.target.value)} value={item.piece}/></td>
+                            <td style={{ width: 130 }}>
+                                <Form.Control
+                                    type="number"
+                                    onChange={(e) =>
+                                        changePieceFromBasket(
+                                            item._id,
+                                            1,
+                                            e.target.value
+                                        )
+                                    }
+                                    value={item.piece}
+                                />
+                            </td>
                             {/* <td className="text-nowrap">
                                 {format(item.price, {
                                     currency: "₺",
@@ -61,7 +73,7 @@ function BasketNavbar({ handleClose }) {
                                     thousandSeparator: ".",
                                 })}
                             </td> */}
-                            <td style={{width:30}}>
+                            <td style={{ width: 30 }}>
                                 <CloseButton
                                     onClick={() => delFromBasket(item.name)}
                                 />
@@ -96,14 +108,26 @@ function BasketNavbar({ handleClose }) {
                 />
             </Form.Group>
             <Button
-                onClick={() => createOrderMutation.mutate({items: items, description: description+" ", status: 3})}
+                onClick={() =>
+                    createOrderMutation.mutate({
+                        items: items,
+                        description: description + " ",
+                        status: 3,
+                    })
+                }
                 variant="primary"
             >
                 Sipariş oluştur
             </Button>
             <Button
                 className="ms-3"
-                onClick={() => createOrderMutation.mutate({items: items, description: description+" ", status: 1})}
+                onClick={() =>
+                    createOrderMutation.mutate({
+                        items: items,
+                        description: description + " ",
+                        status: 1,
+                    })
+                }
                 variant="danger"
             >
                 Teklif İste
