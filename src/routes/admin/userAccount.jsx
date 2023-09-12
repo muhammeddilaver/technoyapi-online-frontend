@@ -249,9 +249,9 @@ function UserAccount() {
                                 thousandSeparator: ".",
                             }
                         )}
-                    {balanceData.result > 0 && " borcunuz bulunmaktadır."}
-                    {balanceData.result < 0 && " alacaklısınız."}
-                    {balanceData.result === 0 && "Borcunuz bulunmamaktadır."}
+                    {balanceData.result > 0 && " borcu bulunmaktadır."}
+                    {balanceData.result < 0 && " alacaklı."}
+                    {balanceData.result === 0 && "Borcu bulunmamaktadır."}
                 </Alert>
             </Row>
         </Container>

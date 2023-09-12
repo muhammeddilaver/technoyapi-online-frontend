@@ -132,7 +132,7 @@ export const fetchSearchUsersAdmin = async (keyword) => {
         keyword = "a";
     }
     const { data } = await axios.get(
-        `${import.meta.env.VITE_BASE_ENDPOINT}/auth/users/search/${keyword}`
+        `${import.meta.env.VITE_BASE_ENDPOINT}/auth/users/search/${encodeURIComponent(keyword)}`
     );
     return data;
 };
@@ -198,7 +198,7 @@ export const fetchSearchList = async (pageParam) => {
     }
     const { data } = await axios.get(
         `${import.meta.env.VITE_BASE_ENDPOINT}/product/search/${
-            pageParam.queryKey[1]
+            encodeURIComponent(pageParam.queryKey[1])
         }?page=${pageParam.pageParam}`
     );
     return data;

@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { Container } from "react-bootstrap";
+import { Container, ListGroup } from "react-bootstrap";
 import React, { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { fetchSearchList } from "../../../api";
@@ -49,27 +49,25 @@ function SearchList({ keyword, setkeyword }) {
     if (status === "error") return <ProductRequest setkeyword={setkeyword} />;
 
     return (
-        <Container className="justify-content-left d-xl-flex">
-            <div className="card-deck container mb-3 text-center">
-                {data.pages.map((group, i) => (
-                    <React.Fragment key={i}>
-                        {group.map((product, key) => (
-                            <ProductCard key={key} item={product} />
-                        ))}
-                    </React.Fragment>
-                ))}
-                <div>
-                    <span
-                        ref={ref}
-                        onClick={() => fetchNextPage()}
-                        disabled={!hasNextPage || isFetchingNextPage}
-                        style={{ opacity: 0 }}
-                    >
-                        asdasd
-                    </span>
-                </div>
+        <ListGroup as="ol">
+            {data.pages.map((group, i) => (
+                <React.Fragment key={i}>
+                    {group.map((product, key) => (
+                        <ProductCard key={key} item={product} />
+                    ))}
+                </React.Fragment>
+            ))}
+            <div>
+                <span
+                    ref={ref}
+                    onClick={() => fetchNextPage()}
+                    disabled={!hasNextPage || isFetchingNextPage}
+                    style={{ opacity: 0 }}
+                >
+                    asdasd
+                </span>
             </div>
-        </Container>
+        </ListGroup>
     );
 }
 
