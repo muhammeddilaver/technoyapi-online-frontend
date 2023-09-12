@@ -16,7 +16,6 @@ function Users() {
 
     const addUserMutation = useMutation(createUser, {
         onSuccess: (val) => {
-            console.log(val);
             queryClient.invalidateQueries(["users"]);
             queryClient.refetchQueries(["users"]);
             form.resetFields();
@@ -41,7 +40,6 @@ function Users() {
         setConfirmLoading(true);
         form.validateFields()
             .then((values) => {
-                console.log("Validate Failed:", values);
                 addUserMutation.mutate(values);
             })
             .catch((info) => {
@@ -61,7 +59,7 @@ function Users() {
 
     return (
         <Container style={{ marginTop: 80 }}>
-            <Row className="align-items-center">
+            <Row>
                 <Col xs="auto">
                     <InputGroup className="mb-3">
                         <Form.Control

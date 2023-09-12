@@ -36,19 +36,26 @@ function UserList({ userKeyword }) {
             key: "email",
         },
         {
-            title: '',
-            key: 'action',
+            title: "",
+            key: "action",
             render: (_, record) => (
-              <Space size="middle">
-                <a onClick={() => navigate(`/admin/user/${record._id}/account`)}>Hesap Dökümü</a>
-                <a>Kullanıcıyı Düzenle</a>
-              </Space>
+                <Space size="middle">
+                    <a
+                        onClick={() =>
+                            navigate(`/admin/user/${record._id}/account`)
+                        }
+                    >
+                        Hesap Dökümü
+                    </a>
+                    <a>Kullanıcıyı Düzenle</a>
+                </Space>
             ),
-          },
+        },
     ];
 
     return (
-        <Table style={{"marginTop": "10px"}}
+        <Table
+            style={{ marginTop: "10px" }}
             /* onRow={(record) => {
                         return {
                             onClick: () => {

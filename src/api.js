@@ -174,6 +174,14 @@ export const createUser = async (user) => {
     return data;
 };
 
+export const createPayment = async (payment) => {
+    const { data } = await axios.post(
+        `${import.meta.env.VITE_BASE_ENDPOINT}/auth/payment`,
+        payment
+    );
+    return data;
+};
+
 export const fetchProductsList = async ({ pageParam = 0 }) => {
     const { data } = await axios.get(
         `${import.meta.env.VITE_BASE_ENDPOINT}/product?page=${pageParam}`
