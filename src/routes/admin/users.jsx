@@ -60,7 +60,7 @@ function Users() {
     };
 
     return (
-        <Container fluid style={{ marginTop: 80 }}>
+        <Container style={{ marginTop: 80 }}>
             <Row className="align-items-center">
                 <Col xs="auto">
                     <InputGroup className="mb-3">
