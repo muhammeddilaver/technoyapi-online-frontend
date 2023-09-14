@@ -229,14 +229,14 @@ function NewOrder() {
                                     <td>{product.name}</td>
                                     <td style={{ width: 140 }}>
                                         <Form.Control
-                                            type="number"
+                                            
                                             name={`products.${key}.piece`}
-                                            min={1}
+                                            
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={
                                                 formik.values.products?.[key]
-                                                    ?.piece || 0
+                                                    ?.piece || ""  // düşünüyoruz
                                             }
                                         />
                                     </td>

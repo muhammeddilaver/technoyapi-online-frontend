@@ -26,7 +26,7 @@ import UserAccount from "./routes/admin/userAccount.jsx";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            refetchOnMount:true,
+            refetchOnMount:false,
             refetchOnWindowFocus: false,
         }
     }

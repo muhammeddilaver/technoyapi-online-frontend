@@ -43,12 +43,12 @@ function BasketNavbar({ handleClose }) {
                         responsive
                         bordered
                         hover
-                        style={{ minWidth: 900 }}>
+                        style={{ minWidth: 500 }}>
                 <thead>
                     <tr>
                         <th className="col-lg-1">#</th>
-                        <th style={{ minWidth: 250 }}>Ürün adı</th>
-                        <th className="col-lg-2">Adet</th>
+                        <th style={{ minWidth: 300 }}>Ürün adı</th>
+                        <th className="col-lg-2 col-xs-6 col-sm-6">Adet</th>
                         {/* <th>Fiyat</th> */}
                     </tr>
                 </thead>
@@ -56,8 +56,8 @@ function BasketNavbar({ handleClose }) {
                     {items.map((item, key) => (
                         <tr key={key}>
                             <td style={{ width: 40 }}>{key + 1}</td>
-                            <td className="text-nowrap">{item.name}</td>
-                            <td style={{ width: 160 }}>
+                            <td>{item.name}</td>
+                            <td style={{ width: 100 }}>
                                 <Form.Control
                                     type="number"
                                     onChange={(e) =>
