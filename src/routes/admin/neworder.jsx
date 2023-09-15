@@ -11,6 +11,7 @@ import { useFormik } from "formik";
 import Select, { components } from "react-select";
 import { useToast } from "../../contexts/ToastContext";
 import { useNavigate } from "react-router-dom";
+import { neworderValidations } from "../../validations/yup";
 
 function NewOrder() {
     const { createToast } = useToast();
@@ -19,6 +20,7 @@ function NewOrder() {
     const [productKeyword, setproductKeyword] = useState("");
     const [dolar, setDolar] = useState(null);
     const [euro, setEuro] = useState(null);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     const { data: userData } = useQuery(["userSearch", userKeyword], () =>
         fetchSearchUsersAdmin(userKeyword)
@@ -53,6 +55,10 @@ function NewOrder() {
         getCurrency();
     }, []);
 
+    useEffect(() => {
+        formik.setFieldValue("total_price", totalPrice);
+    }, [totalPrice]);
+
     const formik = useFormik({
         initialValues: {
             products: [],
@@ -63,35 +69,36 @@ function NewOrder() {
         onSubmit: async (values, bag) => {
             newOrderMutation.mutate(values);
         },
+        validationSchema: neworderValidations,
     });
 
     useEffect(() => {
         for (let i = 0; i < formik.values.products.length; i++) {
             formik.values.products[i].price =
-                formik.values.products[i].exact_price *
+                parseFloat(formik.values.products[i].exact_price) *
                     (formik.values.products?.[i]?.currency === "DOLAR"
                         ? dolar
                         : formik.values.products?.[i]?.currency === "EURO"
                         ? euro
                         : 1) +
-                (formik.values.products[i].exact_price *
+                (parseFloat(formik.values.products[i].exact_price) *
                     (formik.values.products?.[i]?.currency === "DOLAR"
                         ? dolar
                         : formik.values.products?.[i]?.currency === "EURO"
                         ? euro
                         : 1) *
-                    formik.values.products[i].factor) /
+                    parseFloat(formik.values.products[i].factor)) /
                     100;
-            if (!formik.values.products[i].piece) {
-                formik.values.products[i].piece = 0;
-            }
+            formik.values.products[i].last_price =
+                parseFloat(formik.values.products[i].price) *
+                parseFloat(formik.values.products[i].piece);
         }
 
-        let totalPrice = 0;
+        let newTotalPrice = 0;
         formik.values.products.forEach((product) => {
-            totalPrice += product.price * product.piece;
+            newTotalPrice += product.price * product.piece;
         });
-        formik.setFieldValue("total_price", totalPrice);
+        setTotalPrice(newTotalPrice);
     }, [formik.values.products]);
 
     const handleUserSearchChange = (selectedOption) => {
@@ -166,13 +173,19 @@ function NewOrder() {
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
-                <form onSubmit={formik.handleSubmit}>
+                <Form noValidate onSubmit={formik.handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>İşlem Tipi:</Form.Label>
                         <Form.Select
                             name={`status`}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
+                            isValid={
+                                formik.touched.status && !formik.errors.status
+                            }
+                            isInvalid={
+                                formik.touched.status && formik.errors.status
+                            }
                         >
                             <option value={4}>Sipariş Al</option>
                             <option value={2}>Teklif ver.</option>
@@ -184,8 +197,19 @@ function NewOrder() {
                             onChange={handleUserSearchChange}
                             onInputChange={handleUserInputChange}
                             options={userOptions}
+                            isValid={
+                                formik.touched.user_id && !formik.errors.user_id
+                            }
+                            isInvalid={
+                                formik.touched.user_id && formik.errors.user_id
+                            }
                             placeholder="Siparişi veren firma bilgileri."
                         />
+                        {formik.touched.user_id && formik.errors.user_id && (
+                            <div className="text-danger">
+                                Siparişi alacak müşteriyi seçiniz.
+                            </div>
+                        )}
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Ürün Ekle:</Form.Label>
@@ -229,14 +253,24 @@ function NewOrder() {
                                     <td>{product.name}</td>
                                     <td style={{ width: 140 }}>
                                         <Form.Control
-                                            
                                             name={`products.${key}.piece`}
-                                            
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
+                                            isValid={
+                                                formik.touched.products?.[key]
+                                                    ?.piece &&
+                                                !formik.errors.products?.[key]
+                                                    ?.piece
+                                            }
+                                            isInvalid={
+                                                formik.touched.products?.[key]
+                                                    ?.piece &&
+                                                formik.errors.products?.[key]
+                                                    ?.piece
+                                            }
                                             value={
                                                 formik.values.products?.[key]
-                                                    ?.piece || ""  // düşünüyoruz
+                                                    ?.piece
                                             }
                                         />
                                     </td>
@@ -248,52 +282,23 @@ function NewOrder() {
                                         <Form.Control
                                             type="text"
                                             name={`products.${key}.exact_price`}
-                                            onChange={(event) => {
-                                                formik.handleChange(event);
-                                                const updatedValue =
-                                                    parseFloat(
-                                                        event.target.value
-                                                    ) *
-                                                        (formik.values
-                                                            .products?.[key]
-                                                            ?.currency ===
-                                                        "DOLAR"
-                                                            ? dolar
-                                                            : formik.values
-                                                                  .products?.[
-                                                                  key
-                                                              ]?.currency ===
-                                                              "EURO"
-                                                            ? euro
-                                                            : 1) || 0;
-                                                formik.setFieldValue(
-                                                    `products.${key}.price`,
-                                                    updatedValue +
-                                                        (updatedValue *
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.factor) /
-                                                            100 || 0
-                                                );
-                                                formik.setFieldValue(
-                                                    `products.${key}.last_price`,
-                                                    (updatedValue +
-                                                        (updatedValue *
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.factor) /
-                                                            100) *
-                                                        parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.piece
-                                                        ) || 0
-                                                );
-                                            }}
+                                            isValid={
+                                                formik.touched.products?.[key]
+                                                    ?.exact_price &&
+                                                !formik.errors.products?.[key]
+                                                    ?.exact_price
+                                            }
+                                            isInvalid={
+                                                formik.touched.products?.[key]
+                                                    ?.exact_price &&
+                                                formik.errors.products?.[key]
+                                                    ?.exact_price
+                                            }
+                                            onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={
                                                 formik.values.products?.[key]
-                                                    ?.exact_price || 0
+                                                    ?.exact_price
                                             }
                                         />
                                     </td>
@@ -304,71 +309,19 @@ function NewOrder() {
                                     >
                                         <Form.Select
                                             name={`products.${key}.currency`}
-                                            onChange={(event) => {
-                                                formik.handleChange(event);
-                                                formik.setFieldValue(
-                                                    `products.${key}.price`,
-                                                    (parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.exact_price
-                                                    ) *
-                                                        (event.target.value ===
-                                                        "DOLAR"
-                                                            ? dolar
-                                                            : event.target
-                                                                  .value ===
-                                                              "EURO"
-                                                            ? euro
-                                                            : 1) || 0) +
-                                                        (parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.factor
-                                                        ) *
-                                                            parseFloat(
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            ) *
-                                                            (event.target
-                                                                .value ===
-                                                            "DOLAR"
-                                                                ? dolar
-                                                                : event.target
-                                                                      .value ===
-                                                                  "EURO"
-                                                                ? euro
-                                                                : 1) || 0) /
-                                                            100 || 0
-                                                );
-                                                formik.setFieldValue(
-                                                    `products.${key}.last_price`,
-                                                    ((parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.exact_price
-                                                    ) || 0) +
-                                                        (parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.factor
-                                                        ) *
-                                                            parseFloat(
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            ) || 0) /
-                                                            100) *
-                                                        parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.piece
-                                                        ) || 0
-                                                );
-                                            }}
+                                            isValid={
+                                                formik.touched.products?.[key]
+                                                    ?.currency &&
+                                                !formik.errors.products?.[key]
+                                                    ?.currency
+                                            }
+                                            isInvalid={
+                                                formik.touched.products?.[key]
+                                                    ?.currency &&
+                                                formik.errors.products?.[key]
+                                                    ?.currency
+                                            }
+                                            onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={
                                                 formik.values.products?.[key]
@@ -386,106 +339,24 @@ function NewOrder() {
                                         }}
                                     >
                                         <Form.Control
-                                            type="number"
                                             name={`products.${key}.factor`}
-                                            onChange={(event) => {
-                                                formik.handleChange(event);
-                                                const updatedValue =
-                                                    parseFloat(
-                                                        event.target.value
-                                                    ) || 0;
-                                                formik.setFieldValue(
-                                                    `products.${key}.price`,
-                                                    (parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.exact_price
-                                                    ) *
-                                                        (formik.values
-                                                            .products?.[key]
-                                                            ?.currency ===
-                                                        "DOLAR"
-                                                            ? dolar
-                                                            : formik.values
-                                                                  .products?.[
-                                                                  key
-                                                              ]?.currency ===
-                                                              "EURO"
-                                                            ? euro
-                                                            : 1) || 0) +
-                                                        (updatedValue *
-                                                            parseFloat(
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            ) *
-                                                            (formik.values
-                                                                .products?.[key]
-                                                                ?.currency ===
-                                                            "DOLAR"
-                                                                ? dolar
-                                                                : formik.values
-                                                                      .products?.[
-                                                                      key
-                                                                  ]
-                                                                      ?.currency ===
-                                                                  "EURO"
-                                                                ? euro
-                                                                : 1) || 0) /
-                                                            100 || 0
-                                                );
-                                                formik.setFieldValue(
-                                                    `products.${key}.last_price`,
-                                                    ((parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.exact_price
-                                                    ) *
-                                                        (formik.values
-                                                            .products?.[key]
-                                                            ?.currency ===
-                                                        "DOLAR"
-                                                            ? dolar
-                                                            : formik.values
-                                                                  .products?.[
-                                                                  key
-                                                              ]?.currency ===
-                                                              "EURO"
-                                                            ? euro
-                                                            : 1) || 0) +
-                                                        (updatedValue *
-                                                            parseFloat(
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            ) *
-                                                            (formik.values
-                                                                .products?.[key]
-                                                                ?.currency ===
-                                                            "DOLAR"
-                                                                ? dolar
-                                                                : formik.values
-                                                                      .products?.[
-                                                                      key
-                                                                  ]
-                                                                      ?.currency ===
-                                                                  "EURO"
-                                                                ? euro
-                                                                : 1) || 0) /
-                                                            100) *
-                                                        parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.piece
-                                                        ) || 0
-                                                );
-                                            }}
+                                            isValid={
+                                                formik.touched.products?.[key]
+                                                    ?.factor &&
+                                                !formik.errors.products?.[key]
+                                                    ?.factor
+                                            }
+                                            isInvalid={
+                                                formik.touched.products?.[key]
+                                                    ?.factor &&
+                                                formik.errors.products?.[key]
+                                                    ?.factor
+                                            }
+                                            onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={
                                                 formik.values.products?.[key]
-                                                    ?.factor || 0
+                                                    ?.factor
                                             }
                                         />
                                     </td>
@@ -495,47 +366,23 @@ function NewOrder() {
                                             disabled
                                             type="number"
                                             name={`products.${key}.price`}
+                                            isValid={
+                                                formik.touched.products?.[key]
+                                                    ?.price &&
+                                                !formik.errors.products?.[key]
+                                                    ?.price
+                                            }
+                                            isInvalid={
+                                                formik.touched.products?.[key]
+                                                    ?.price &&
+                                                formik.errors.products?.[key]
+                                                    ?.price
+                                            }
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={
-                                                (parseFloat(
-                                                    formik.values.products?.[
-                                                        key
-                                                    ]?.exact_price
-                                                ) *
-                                                    (formik.values.products?.[
-                                                        key
-                                                    ]?.currency === "DOLAR"
-                                                        ? dolar
-                                                        : formik.values
-                                                              .products?.[key]
-                                                              ?.currency ===
-                                                          "EURO"
-                                                        ? euro
-                                                        : 1) || 0) +
-                                                    ((parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.exact_price
-                                                    ) *
-                                                        (formik.values
-                                                            .products?.[key]
-                                                            ?.currency ===
-                                                        "DOLAR"
-                                                            ? dolar
-                                                            : formik.values
-                                                                  .products?.[
-                                                                  key
-                                                              ]?.currency ===
-                                                              "EURO"
-                                                            ? euro
-                                                            : 1) || 0) *
-                                                        parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.factor
-                                                        )) /
-                                                        100 || 0
+                                                formik.values.products?.[key]
+                                                    ?.price
                                             }
                                         />
                                     </td>
@@ -544,52 +391,23 @@ function NewOrder() {
                                             disabled
                                             type="number"
                                             name={`products.${key}.last_price`}
+                                            isValid={
+                                                formik.touched.products?.[key]
+                                                    ?.last_price &&
+                                                !formik.errors.products?.[key]
+                                                    ?.last_price
+                                            }
+                                            isInvalid={
+                                                formik.touched.products?.[key]
+                                                    ?.last_price &&
+                                                formik.errors.products?.[key]
+                                                    ?.last_price
+                                            }
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             value={
-                                                (parseFloat(
-                                                    formik.values.products?.[
-                                                        key
-                                                    ]?.exact_price
-                                                ) *
-                                                    (formik.values.products?.[
-                                                        key
-                                                    ]?.currency === "DOLAR"
-                                                        ? dolar
-                                                        : formik.values
-                                                              .products?.[key]
-                                                              ?.currency ===
-                                                          "EURO"
-                                                        ? euro
-                                                        : 1) +
-                                                    (parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.exact_price
-                                                    ) *
-                                                        (formik.values
-                                                            .products?.[key]
-                                                            ?.currency ===
-                                                        "DOLAR"
-                                                            ? dolar
-                                                            : formik.values
-                                                                  .products?.[
-                                                                  key
-                                                              ]?.currency ===
-                                                              "EURO"
-                                                            ? euro
-                                                            : 1) *
-                                                        parseFloat(
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.factor
-                                                        )) /
-                                                        100) *
-                                                    parseFloat(
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.piece
-                                                    ) || 0
+                                                formik.values.products?.[key]
+                                                    ?.last_price
                                             }
                                         />
                                     </td>
@@ -624,28 +442,38 @@ function NewOrder() {
                                     <Form.Control
                                         disabled
                                         type="number"
-                                        name={`total_price`}
+                                        value={totalPrice}
                                         onChange={formik.handleChange}
+                                        name={`total_price`}
                                         onBlur={formik.handleBlur}
-                                        value={formik.values.total_price || 0}
                                     />
                                 </td>
                                 <td></td>
                             </tr>
                         </tbody>
                     </Table>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3" controlId="validationFormik01">
                         <Form.Label>Açıklama:</Form.Label>
                         <Form.Control
                             name={`description`}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
+                            isValid={
+                                formik.touched.description &&
+                                !formik.errors.description
+                            }
+                            isInvalid={
+                                formik.touched.description &&
+                                formik.errors.description
+                            }
                             value={formik.values.description || ""}
                         ></Form.Control>
                     </Form.Group>
                     <Button type="submit">Sipariş Oluştur</Button>
-                    {/* <Button onClick={() => console.log(formik.values)}>Test</Button> */}
-                </form>
+                    {/* <Button onClick={() => console.log(formik.values)}>
+                        Test
+                    </Button> */}
+                </Form>
             </Row>
         </Container>
     );
