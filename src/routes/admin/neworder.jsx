@@ -212,27 +212,23 @@ function NewOrder() {
                             </div>
                         )}
                     </Form.Group>
-                    {(formik.values.status === 1 ||
-                        formik.values.status === 3) && (
-                        <Form.Group className="mb-3">
-                            <Form.Label>Ürün Ekle:</Form.Label>
-                            <Select
-                                value={productKeyword}
-                                components={{ NoOptionsMessage }}
-                                styles={{
-                                    noOptionsMessage: (base) => ({
-                                        ...base,
-                                        ...msgStyles,
-                                    }),
-                                }}
-                                onChange={handleProductSearchChange}
-                                onInputChange={handleProductInputChange}
-                                options={productOptions}
-                                placeholder="Eklemek istediğiniz ürünü giriniz."
-                            />
-                        </Form.Group>
-                    )}
-
+                    <Form.Group className="mb-3">
+                        <Form.Label>Ürün Ekle:</Form.Label>
+                        <Select
+                            value={productKeyword}
+                            components={{ NoOptionsMessage }}
+                            styles={{
+                                noOptionsMessage: (base) => ({
+                                    ...base,
+                                    ...msgStyles,
+                                }),
+                            }}
+                            onChange={handleProductSearchChange}
+                            onInputChange={handleProductInputChange}
+                            options={productOptions}
+                            placeholder="Eklemek istediğiniz ürünü giriniz."
+                        />
+                    </Form.Group>
                     <Table
                         striped
                         responsive
