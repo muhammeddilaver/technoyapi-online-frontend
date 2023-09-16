@@ -437,7 +437,7 @@ function OrderAdmin() {
                                 responsive
                                 bordered
                                 hover
-                                style={{ minWidth: 800 }}
+                                style={{ minWidth: 900 }}
                             >
                                 <thead>
                                     <tr>
@@ -500,7 +500,7 @@ function OrderAdmin() {
                                                             />
                                                         )}
                                                     </td>
-                                                    <td style={{ width: 40 }}>
+                                                    <td style={{ width: 140 }}>
                                                         <Form.Control
                                                             name={`products.${key}.piece`}
                                                             isValid={
