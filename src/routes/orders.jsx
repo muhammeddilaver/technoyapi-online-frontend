@@ -1,6 +1,6 @@
 import { useInView } from "react-intersection-observer";
 import { fetchOrdersList } from "../api";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { Container, Table } from "react-bootstrap";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
@@ -26,6 +26,15 @@ function Orders() {
     const navigate = useNavigate();
 
     const initialData = useLoaderData();
+
+    const queryClient = useQueryClient();
+
+    queryClient.setDefaultOptions({
+        queries: {
+            refetchOnMount: true,
+            refetchOnWindowFocus: true,
+        },
+    });
 
     const {
         data,
@@ -91,7 +100,7 @@ function Orders() {
                         <th>Tutar</th>
                         <th>Açıklama</th>
                         <th>Teslimat Tarihi</th>
-                        <th>Durum</th>  
+                        <th>Durum</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -99,7 +108,8 @@ function Orders() {
                     {data.pages.map((page, pageIndex) => (
                         <React.Fragment key={pageIndex}>
                             {page.map((order, orderIndex) => (
-                                <tr onClick={() => handleRowClick(order)}
+                                <tr
+                                    onClick={() => handleRowClick(order)}
                                     className={
                                         order.status === 7
                                             ? "table-danger"

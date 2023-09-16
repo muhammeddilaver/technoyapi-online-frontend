@@ -3,12 +3,15 @@ import { useBasket } from "../../contexts/BasketContext";
 import { useFormik } from "formik";
 import { useToast } from "../../contexts/ToastContext";
 
-function ProductRequest({ setkeyword }) {
+function ProductRequest({ keyword, setkeyword }) {
     const { addToBasket } = useBasket();
     const { createToast } = useToast();
 
     const formik = useFormik({
-        initialValues: {},
+        initialValues: {
+            name: keyword,
+            piece: 1,
+        },
         onSubmit: async (values, bag) => {
             addToBasket({ name: values.name }, values.piece);
             setkeyword("");
@@ -34,6 +37,7 @@ function ProductRequest({ setkeyword }) {
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             placeholder="Ürünü tanımlayınız..."
+                            value={formik.values.name}
                         />
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -44,6 +48,7 @@ function ProductRequest({ setkeyword }) {
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             placeholder="Ürünü adedini giriniz..."
+                            value={formik.values.piece}
                         />
                     </Form.Group>
                     <Button type="submit">Sepete Ekle</Button>

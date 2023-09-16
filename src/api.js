@@ -39,9 +39,10 @@ export const acceptOrRejectOffer = async ({ status, orderId }) => {
     return data;
 };
 
-export const addProductToOrder = async ({ product_id, orderId }) => {
+export const addProductToOrder = async ({ product_id, orderId, name }) => {
     const dataForm = {
         product_id: product_id,
+        name: name
     };
 
     const { data } = await axios.put(
@@ -145,15 +146,10 @@ export const fetchOrdersListAdmin = async ({ pageParam = 1 }) => {
     return data;
 };
 
-export const createOrder = async ({ items, description, status }) => {
-    const dataForm = {
-        products: JSON.stringify(items),
-        description: description,
-        status: status,
-    };
+export const createOrder = async (order) => {
     const { data } = await axios.post(
         `${import.meta.env.VITE_BASE_ENDPOINT}/order`,
-        dataForm
+        order
     );
     return data;
 };
@@ -198,6 +194,21 @@ export const fetchSearchList = async (pageParam) => {
     }
     const { data } = await axios.get(
         `${import.meta.env.VITE_BASE_ENDPOINT}/product/search/${
+            encodeURIComponent(pageParam.queryKey[1])
+        }?page=${pageParam.pageParam}`
+    );
+    return data;
+};
+
+export const fetchAdminSearchList = async (pageParam) => {
+    if (pageParam.pageParam === undefined) {
+        pageParam.pageParam = 1;
+    }
+    if (pageParam.queryKey[1] === "") {
+        pageParam.queryKey[1] = " ";
+    }
+    const { data } = await axios.get(
+        `${import.meta.env.VITE_BASE_ENDPOINT}/product/admin/search/${
             encodeURIComponent(pageParam.queryKey[1])
         }?page=${pageParam.pageParam}`
     );

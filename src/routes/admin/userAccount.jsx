@@ -15,9 +15,15 @@ function UserAccount() {
     const [open, setOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [form] = Form.useForm();
-    const queryClient = useQueryClient();
     const { createToast } = useToast();
-
+    const queryClient = useQueryClient();
+    queryClient.setDefaultOptions({
+        queries: {
+            refetchOnMount: true,
+            refetchOnWindowFocus: true,
+        }
+    });
+    
     const addPaymentMutation = useMutation(createPayment, {
         onSuccess: (val) => {
             queryClient.invalidateQueries(["account", user_id]);

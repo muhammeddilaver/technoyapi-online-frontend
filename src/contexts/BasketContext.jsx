@@ -29,7 +29,7 @@ const BasketProvider = ({ children }) => {
         setitems((prevItems) => prevItems.filter((item) => item.name !== name));
     };
 
-    const changePieceFromBasket = (id, key, piece) => {
+    const changePieceFromBasket = (id, piece) => {
         if(piece === ""){
             piece = 0;
         }

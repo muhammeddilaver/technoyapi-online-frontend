@@ -36,3 +36,18 @@ export const shortOrderAdminValidations = object().shape({
     total_price: number().required(),
     description: string(),
 });
+
+export const basketValidations = object().shape({
+    status: number().required(),
+    products: array().of(
+        object().shape({
+            _id: string(),
+            name: string().required(),
+            photos: array().of(string()),
+            piece: number().required(),
+            price: number(),
+            status: boolean(),
+        })
+    ),
+    description: string(),
+});

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     createAdminOrder,
     currencyRates,
-    fetchSearchList,
+    fetchAdminSearchList,
     fetchSearchUsersAdmin,
 } from "../../api";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ function NewOrder() {
 
     const { data: productData } = useQuery(
         ["order", productKeyword],
-        fetchSearchList
+        fetchAdminSearchList
     );
 
     const queryClient = useQueryClient();
@@ -143,6 +143,7 @@ function NewOrder() {
                 inventory: 1000,
                 name: name,
                 photos: [],
+                piece: 0,
                 price: 0,
                 status: false,
             },
@@ -211,23 +212,27 @@ function NewOrder() {
                             </div>
                         )}
                     </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Ürün Ekle:</Form.Label>
-                        <Select
-                            value={productKeyword}
-                            components={{ NoOptionsMessage }}
-                            styles={{
-                                noOptionsMessage: (base) => ({
-                                    ...base,
-                                    ...msgStyles,
-                                }),
-                            }}
-                            onChange={handleProductSearchChange}
-                            onInputChange={handleProductInputChange}
-                            options={productOptions}
-                            placeholder="Eklemek istediğiniz ürünü giriniz."
-                        />
-                    </Form.Group>
+                    {(formik.values.status === 1 ||
+                        formik.values.status === 3) && (
+                        <Form.Group className="mb-3">
+                            <Form.Label>Ürün Ekle:</Form.Label>
+                            <Select
+                                value={productKeyword}
+                                components={{ NoOptionsMessage }}
+                                styles={{
+                                    noOptionsMessage: (base) => ({
+                                        ...base,
+                                        ...msgStyles,
+                                    }),
+                                }}
+                                onChange={handleProductSearchChange}
+                                onInputChange={handleProductInputChange}
+                                options={productOptions}
+                                placeholder="Eklemek istediğiniz ürünü giriniz."
+                            />
+                        </Form.Group>
+                    )}
+
                     <Table
                         striped
                         responsive

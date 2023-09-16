@@ -6,15 +6,15 @@ import {
     addProductToOrder,
     currencyRates,
     deleteProductFromOrder,
+    fetchAdminSearchList,
     fetchOrderAdmin,
-    fetchSearchList,
     returnProductFromOrder,
     updateOrder,
 } from "../../api";
 import { useToast } from "../../contexts/ToastContext";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import {
     neworderValidations,
     shortOrderAdminValidations,
@@ -30,20 +30,91 @@ function OrderAdmin() {
     const [validationSchema, setValidationSchema] =
         useState(neworderValidations);
 
-    const { isLoading, isError, data, error } = useQuery(
-        ["order", order_id],
-        () => fetchOrderAdmin(order_id)
-    );
+    const queryClient = useQueryClient();
 
     const {
         isLoading: searchIsLoading,
         isError: searchIsError,
         data: searchData,
         error: searchError,
-    } = useQuery(["order", keyword], fetchSearchList);
+    } = useQuery(["order", keyword], fetchAdminSearchList);
+
+    const { isLoading, isError, data, error } = useQuery(
+        ["order", order_id],
+        () => fetchOrderAdmin(order_id)
+    );
+
+    const returnMutation = useMutation(returnProductFromOrder, {
+        onSuccess: () => {
+            //queryClient.invalidateQueries(["order", order_id]);
+            queryClient.refetchQueries(["order", order_id]);
+            createToast({
+                title: "Bilgi",
+                text: "Ürünler iade alındı.",
+            });
+        },
+    });
+
+    const deleteMutation = useMutation(deleteProductFromOrder, {
+        onSuccess: () => {
+            //queryClient.invalidateQueries(["order", order_id]);
+            queryClient.refetchQueries(["order", order_id]);
+            createToast({
+                title: "Bilgi",
+                text: "Ürün başarıyla silindi.",
+            });
+        },
+    });
+
+    const updateMutation = useMutation(updateOrder, {
+        onSuccess: () => {
+            queryClient.invalidateQueries(["order", order_id]);
+            queryClient.refetchQueries(["order", order_id]);
+            createToast({
+                title: "Bilgi",
+                text: "Ürün başarıyla düzenlendi.",
+            });
+        },
+    });
+
+    const addProductMutation = useMutation(addProductToOrder, {
+        onSuccess: () => {
+            queryClient.invalidateQueries(["order", order_id]);
+            queryClient.refetchQueries(["order", order_id]);
+            createToast({
+                title: "Bilgi",
+                text: "Ürün başarıyla düzenlendi.",
+            });
+        },
+    });
+
+    const getCurrency = async () => {
+        const { dolar, euro } = await currencyRates();
+        setDolar(dolar);
+        setEuro(euro);
+    };
+
+    useEffect(() => {
+        getCurrency();
+    }, []);
 
     const formik = useFormik({
-        initialValues: {},
+        initialValues: {
+            client: {
+                _id: "",
+                company_name: "",
+                email: "",
+                name: "",
+                phone: "",
+            },
+            description: "",
+            order_date: "2023-09-15T14:30:17.925Z",
+            products: [],
+            status: 3,
+            total_price: 0,
+            user_id: "",
+            _id: "",
+        },
         onSubmit: async (values, bag) => {
             const prepareValues = {
                 ...values,
@@ -90,8 +161,15 @@ function OrderAdmin() {
     });
 
     useEffect(() => {
-        if (data) {
-            formik.setValues(data[0]);
+        formik.setFieldValue("total_price", totalPrice);
+    }, [totalPrice]);
+
+    useEffect(() => {
+        if (data && data.length > 0) {
+            if (JSON.stringify(data[0]) !== JSON.stringify(formik.values)) {
+                console.log("tekrar");
+                formik.setValues(data[0]);
+            }
         }
     }, [data]);
 
@@ -155,67 +233,7 @@ function OrderAdmin() {
         );
     }, [formik.values.products]);
 
-    const getCurrency = async () => {
-        const { dolar, euro } = await currencyRates();
-        setDolar(dolar);
-        setEuro(euro);
-    };
-
-    useEffect(() => {
-        getCurrency();
-    }, []);
-
-    useEffect(() => {
-        formik.setFieldValue("total_price", totalPrice);
-    }, [totalPrice]);
-
-    const queryClient = useQueryClient();
-
-    const returnMutation = useMutation(returnProductFromOrder, {
-        onSuccess: () => {
-            //queryClient.invalidateQueries(["order", order_id]);
-            queryClient.refetchQueries(["order", order_id]);
-            createToast({
-                title: "Bilgi",
-                text: "Ürünler iade alındı.",
-            });
-        },
-    });
-
-    const deleteMutation = useMutation(deleteProductFromOrder, {
-        onSuccess: () => {
-            //queryClient.invalidateQueries(["order", order_id]);
-            queryClient.refetchQueries(["order", order_id]);
-            createToast({
-                title: "Bilgi",
-                text: "Ürün başarıyla silindi.",
-            });
-        },
-    });
-
-    const updateMutation = useMutation(updateOrder, {
-        onSuccess: () => {
-            queryClient.invalidateQueries(["order", order_id]);
-            queryClient.refetchQueries(["order", order_id]);
-            createToast({
-                title: "Bilgi",
-                text: "Ürün başarıyla düzenlendi.",
-            });
-        },
-    });
-
-    const addProductMutation = useMutation(addProductToOrder, {
-        onSuccess: () => {
-            queryClient.invalidateQueries(["order", order_id]);
-            queryClient.refetchQueries(["order", order_id]);
-            createToast({
-                title: "Bilgi",
-                text: "Ürün başarıyla düzenlendi.",
-            });
-        },
-    });
-
-    if (isLoading) {
+    if (isLoading || !data[0]._id) {
         return <div>Yükleniyor...</div>;
     }
 
@@ -256,9 +274,12 @@ function OrderAdmin() {
 
     const handleSearchChange = (selectedOption) => {
         addProductMutation.mutate({
-            product_id: selectedOption.value._id,
+            product_id: selectedOption.value._id || "0",
             orderId: order_id,
+            name: selectedOption.value.name,
         });
+        selectedOption.value.piece = 1;
+        selectedOption.value.exact_price = selectedOption.value.price;
         setkeyword("");
     };
 
@@ -274,6 +295,44 @@ function OrderAdmin() {
             label: data.name,
         })) || [];
 
+    const newProduct = (name) => {
+        formik.setFieldValue("products", [
+            ...formik.values.products,
+            {
+                exact_price: 0,
+                currency: "TL",
+                factor: 0,
+                inventory: 1000,
+                name: name,
+                photos: [],
+                price: 0,
+                piece: 1,
+                return: 0,
+                status: false,
+            },
+        ]);
+        addProductMutation.mutate({
+            product_id: "0",
+            orderId: order_id,
+            name: name,
+        });
+    };
+
+    const msgStyles = {
+        background: "green",
+        color: "white",
+    };
+
+    const NoOptionsMessage = (props) => {
+        return (
+            <components.NoOptionsMessage {...props}>
+                <option onClick={() => newProduct(props.selectProps.value)}>
+                    Yeni ürün ekle: {props.selectProps.value}
+                </option>
+            </components.NoOptionsMessage>
+        );
+    };
+
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
@@ -281,21 +340,21 @@ function OrderAdmin() {
                     <tbody>
                         <tr>
                             <td>Alıcı Firma</td>
-                            <td>{data[0].client.company_name}</td>
+                            <td>{formik.values.client.company_name}</td>
                         </tr>
                         <tr>
                             <td>Sipariş Tarihi</td>
                             <td>
-                                {moment(data[0].order_date).format(
+                                {moment(formik.values.order_date).format(
                                     "DD.MM.YYYY HH:mm"
                                 )}
                             </td>
                         </tr>
-                        {data[0].delivery_date && (
+                        {formik.values.delivery_date && (
                             <tr>
                                 <td>Teslimat Tarihi</td>
                                 <td>
-                                    {moment(data[0].delivery_date).format(
+                                    {moment(formik.values.delivery_date).format(
                                         "DD.MM.YYYY HH:mm"
                                     )}
                                 </td>
@@ -303,11 +362,11 @@ function OrderAdmin() {
                         )}
                         <tr>
                             <td>Açıklama</td>
-                            <td>{data[0].description}</td>
+                            <td>{formik.values.description}</td>
                         </tr>
                         <tr>
                             <td>Durum</td>
-                            <td>{orderStatusMessage(data[0].status)}</td>
+                            <td>{orderStatusMessage(formik.values.status)}</td>
                         </tr>
                     </tbody>
                 </Table>
@@ -316,19 +375,28 @@ function OrderAdmin() {
                 <p>
                     <b>Siparişler:</b>
                 </p>
-                <Form.Group
-                    className="mb-3"
-                    controlId="exampleForm.ControlInput1"
-                >
-                    <Form.Label>Ürün ekle:</Form.Label>
-                    <Select
-                        value={keyword}
-                        onChange={handleSearchChange}
-                        onInputChange={handleInputChange}
-                        options={options}
-                        placeholder="Listeye eklemek istediğiniz ürünü giriniz."
-                    />
-                </Form.Group>
+                {(formik.values.status === 1 || formik.values.status === 3) && (
+                    <Form.Group
+                        className="mb-3"
+                        controlId="exampleForm.ControlInput1"
+                    >
+                        <Form.Label>Ürün ekle:</Form.Label>
+                        <Select
+                            value={keyword}
+                            components={{ NoOptionsMessage }}
+                            styles={{
+                                noOptionsMessage: (base) => ({
+                                    ...base,
+                                    ...msgStyles,
+                                }),
+                            }}
+                            onChange={handleSearchChange}
+                            onInputChange={handleInputChange}
+                            options={options}
+                            placeholder="Listeye eklemek istediğiniz ürünü giriniz."
+                        />
+                    </Form.Group>
+                )}
 
                 <Form noValidate onSubmit={formik.handleSubmit}>
                     <Table
@@ -359,7 +427,7 @@ function OrderAdmin() {
                             </tr>
                         </thead>
                         <tbody>
-                            {data[0].products.map(
+                            {formik.values.products.map(
                                 (product, key) =>
                                     product.piece > 0 && (
                                         <tr
@@ -645,21 +713,23 @@ function OrderAdmin() {
                                                 />
                                             </td>
                                             <td>
-                                                {data[0].status === 6 && (
+                                                {formik.values.status === 6 && (
                                                     <Button
                                                         variant="primary"
                                                         onClick={() =>
                                                             handleReturn(
                                                                 product,
-                                                                data[0]._id
+                                                                formik.values
+                                                                    ._id
                                                             )
                                                         }
                                                     >
                                                         İade Al
                                                     </Button>
                                                 )}
-                                                {data[0].status > 0 &&
-                                                    data[0].status < 6 && (
+                                                {formik.values.status > 0 &&
+                                                    formik.values.status <
+                                                        6 && (
                                                         <Button
                                                             onClick={() =>
                                                                 deleteMutation.mutate(
@@ -667,7 +737,8 @@ function OrderAdmin() {
                                                                         productId:
                                                                             product._id,
                                                                         orderId:
-                                                                            data[0]
+                                                                            formik
+                                                                                .values
                                                                                 ._id,
                                                                     }
                                                                 )
@@ -677,7 +748,7 @@ function OrderAdmin() {
                                                             Sil
                                                         </Button>
                                                     )}
-                                                {data[0].status === 6 &&
+                                                {formik.values.status === 6 &&
                                                     product.status === 2 &&
                                                     "İade istendi"}
                                             </td>
@@ -711,7 +782,7 @@ function OrderAdmin() {
                             </tr>
                         </tbody>
                     </Table>
-                    {data[0].products.some(
+                    {formik.values.products.some(
                         (product) => product.return !== 0
                     ) && (
                         <>
@@ -734,7 +805,7 @@ function OrderAdmin() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data[0].products.map(
+                                    {formik.values.products.map(
                                         (product, key) =>
                                             product.return > 0 && (
                                                 <tr key={key}>
@@ -764,7 +835,7 @@ function OrderAdmin() {
                             {formik.values.status === 5 && "Teslim Et"}
                         </Button>
                     )}
-                    {/*                     <Button onClick={() => console.log(formik.values)}>
+                    {/* <Button onClick={() => console.log(formik.values)}>
                         Test
                     </Button> */}
                 </Form>

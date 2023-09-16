@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { format } from "number-currency-format-2";
 import { useInView } from "react-intersection-observer";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchOrdersListAdmin } from "../../api";
 import React, { useEffect } from "react";
 /* import DatePicker, { registerLocale } from "react-datepicker";
@@ -22,6 +22,15 @@ function AdminHome() {
     const { ref, inView } = useInView();
 
     const navigate = useNavigate();
+    
+    const queryClient = useQueryClient();
+
+    queryClient.setDefaultOptions({
+        queries: {
+            refetchOnMount: true,
+            refetchOnWindowFocus: true,
+        }
+    });
 
     const {
         data,
@@ -32,7 +41,7 @@ function AdminHome() {
         isFetchingNextPage,
         status,
     } = useInfiniteQuery({
-        queryKey: ["orderList"],
+        queryKey: ["orderListAdmin"],
         queryFn: fetchOrdersListAdmin,
         getNextPageParam: (lastGroup, allGroups) => {
             const morePageExist = lastGroup?.length === 12;

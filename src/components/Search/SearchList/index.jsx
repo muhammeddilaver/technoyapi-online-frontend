@@ -46,7 +46,7 @@ function SearchList({ keyword, setkeyword }) {
 
     if (status === "loading") return "yükleniyor...";
 
-    if (status === "error") return <ProductRequest setkeyword={setkeyword} />;
+    if (status === "error") return <ProductRequest keyword={keyword} setkeyword={ setkeyword} />;
 
     return (
         <ListGroup as="ol">
