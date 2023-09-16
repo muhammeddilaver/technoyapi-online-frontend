@@ -6,6 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchOrdersListAdmin } from "../../api";
 import React, { useEffect } from "react";
+import { ConfigProvider, Spin } from "antd";
 /* import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import tr from "date-fns/locale/tr";
@@ -22,14 +23,14 @@ function AdminHome() {
     const { ref, inView } = useInView();
 
     const navigate = useNavigate();
-    
+
     const queryClient = useQueryClient();
 
     queryClient.setDefaultOptions({
         queries: {
             refetchOnMount: true,
             refetchOnWindowFocus: true,
-        }
+        },
     });
 
     const {
@@ -59,7 +60,20 @@ function AdminHome() {
         }
     }, [fetchNextPage, inView]);
 
-    if (status === "loading") return "yükleniyor...";
+    if (status === "loading") return (
+        <ConfigProvider
+            theme={{
+                token: {
+                    colorPrimary: "red",
+                    controlHeightLG: 200,
+                },
+            }}
+        >
+            <Spin size="large">
+                <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+            </Spin>
+        </ConfigProvider>
+    );
 
     if (status === "error") return "Sipariş bulunamadı.";
 
@@ -90,7 +104,9 @@ function AdminHome() {
         <>
             <Container style={{ marginTop: 80 }}>
                 <div className="d-flex justify-content-end mb-3">
-                    <Link to="/admin/new_order"><Button>Yeni Sipariş</Button></Link>
+                    <Link to="/admin/new_order">
+                        <Button>Yeni Sipariş</Button>
+                    </Link>
                 </div>
 
                 <Table responsive bordered>

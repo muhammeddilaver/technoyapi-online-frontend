@@ -35,8 +35,8 @@ function NewOrder() {
 
     const newOrderMutation = useMutation(createAdminOrder, {
         onSuccess: () => {
-            //queryClient.invalidateQueries(["order", order_id]);
-            queryClient.refetchQueries(["orderList"]);
+            queryClient.invalidateQueries(["orderListAdmin"]);
+            queryClient.refetchQueries(["orderListAdmin"]);
             createToast({
                 title: "Bilgi",
                 text: "İşlem başarılı.",

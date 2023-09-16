@@ -6,6 +6,7 @@ import { Container, Table } from "react-bootstrap";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { format } from "number-currency-format-2";
+import { ConfigProvider, Spin } from "antd";
 
 const orderQuery = () => ({
     queryKey: ["orderList"],
@@ -63,7 +64,21 @@ function Orders() {
         }
     }, [fetchNextPage, inView]);
 
-    if (status === "loading") return "yükleniyor...";
+    if (status === "loading")
+        return (
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin size="large">
+                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+                </Spin>
+            </ConfigProvider>
+        );
 
     if (status === "error") return "Sipariş bulunamadı.";
 

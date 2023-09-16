@@ -9,6 +9,7 @@ import {
 } from "../api";
 import { format } from "number-currency-format-2";
 import { useToast } from "../contexts/ToastContext";
+import { ConfigProvider, Spin } from "antd";
 
 function Order() {
     const { order_id } = useParams();
@@ -40,7 +41,20 @@ function Order() {
     });
 
     if (isLoading) {
-        return <div>Yükleniyor...</div>;
+        return (
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin size="large">
+                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+                </Spin>
+            </ConfigProvider>
+        );
     }
 
     if (isError) {
@@ -67,7 +81,7 @@ function Order() {
     };
 
     return (
-        <Container className="">
+        <Container>
             <Row>
                 <Table striped responsive bordered hover>
                     <tbody>

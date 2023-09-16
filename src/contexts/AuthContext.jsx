@@ -3,6 +3,8 @@ import { fetchLogout, fetchMe } from "../api";
 import PropTypes from "prop-types";
 import Spinner from "react-bootstrap/Spinner";
 import { redirect } from "react-router-dom";
+import { ConfigProvider, Spin } from "antd";
+import { Container } from "react-bootstrap";
 
 const AuthContext = createContext();
 
@@ -51,10 +53,17 @@ const AuthProvider = ({ children }) => {
     };
 
     if (loading) {
-        return (
-            <Spinner className="min-vh-100 d-flex justify-content-center align-items-center" animation="border" variant="danger" role="status">
-                <span className="visually-hidden">Loading...</span>
-            </Spinner>
+        return (<ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: "red",
+                controlHeightLG: 200
+              }
+            }}
+          >
+            <Spin size="large">
+                <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+            </Spin></ConfigProvider>
         );
     }
 

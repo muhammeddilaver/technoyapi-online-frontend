@@ -20,10 +20,6 @@ function Account() {
         error: balanceError,
     } = useQuery(["balance"], () => getBalance());
 
-    if (isLoading || balanceIsLoading) {
-        return <div>Yükleniyor...</div>;
-    }
-
     if (isError || balanceIsError) {
         return <div>Sipariş bulunamadı</div>;
     }
@@ -93,6 +89,7 @@ function Account() {
             <Row>
                 <h2>Hesap Dökümü</h2>
                 <Table
+                    loading={isLoading}
                     onRow={(record) => {
                         return {
                             onClick: () => {
@@ -105,30 +102,36 @@ function Account() {
                         position: ["topRight"],
                     }} */
                     columns={columns}
-                    dataSource={data.map((item) => ({
-                        ...item,
-                        key: item._id,
-                    }))}
+                    dataSource={
+                        !isLoading &&
+                        data.map((item) => ({
+                            ...item,
+                            key: item._id,
+                        }))
+                    }
                 />
-                <Alert
-                    className="text-center"
-                    key={balanceData.result > 0 ? "danger" : "success"}
-                    variant={balanceData.result > 0 ? "danger" : "success"}
-                >
-                    {balanceData.result !== 0 &&
-                        format(
-                            balanceData.result *
-                                (balanceData.result < 0 ? -1 : 1),
-                            {
-                                currency: "₺",
-                                decimalSeparator: ",",
-                                thousandSeparator: ".",
-                            }
-                        )}
-                    {balanceData.result > 0 && " borcunuz bulunmaktadır."}
-                    {balanceData.result < 0 && " alacaklısınız."}
-                    {balanceData.result === 0 && "Borcunuz bulunmamaktadır."}
-                </Alert>
+                {!balanceIsLoading && (
+                    <Alert
+                        className="text-center"
+                        key={balanceData.result > 0 ? "danger" : "success"}
+                        variant={balanceData.result > 0 ? "danger" : "success"}
+                    >
+                        {balanceData.result !== 0 &&
+                            format(
+                                balanceData.result *
+                                    (balanceData.result < 0 ? -1 : 1),
+                                {
+                                    currency: "₺",
+                                    decimalSeparator: ",",
+                                    thousandSeparator: ".",
+                                }
+                            )}
+                        {balanceData.result > 0 && " borcunuz bulunmaktadır."}
+                        {balanceData.result < 0 && " alacaklısınız."}
+                        {balanceData.result === 0 &&
+                            "Borcunuz bulunmamaktadır."}
+                    </Alert>
+                )}
             </Row>
         </Container>
     );

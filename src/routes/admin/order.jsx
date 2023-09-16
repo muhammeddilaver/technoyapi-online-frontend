@@ -19,6 +19,7 @@ import {
     neworderValidations,
     shortOrderAdminValidations,
 } from "../../validations/yup";
+import { ConfigProvider, Spin } from "antd";
 
 function OrderAdmin() {
     const { order_id } = useParams();
@@ -27,6 +28,7 @@ function OrderAdmin() {
     const [dolar, setDolar] = useState(null);
     const [euro, setEuro] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [isSpin, setisSpin] = useState(false);
     const [validationSchema, setValidationSchema] =
         useState(neworderValidations);
 
@@ -48,6 +50,7 @@ function OrderAdmin() {
         onSuccess: () => {
             //queryClient.invalidateQueries(["order", order_id]);
             queryClient.refetchQueries(["order", order_id]);
+            setisSpin(false);
             createToast({
                 title: "Bilgi",
                 text: "Ürünler iade alındı.",
@@ -59,6 +62,7 @@ function OrderAdmin() {
         onSuccess: () => {
             //queryClient.invalidateQueries(["order", order_id]);
             queryClient.refetchQueries(["order", order_id]);
+            setisSpin(false);
             createToast({
                 title: "Bilgi",
                 text: "Ürün başarıyla silindi.",
@@ -70,6 +74,7 @@ function OrderAdmin() {
         onSuccess: () => {
             queryClient.invalidateQueries(["order", order_id]);
             queryClient.refetchQueries(["order", order_id]);
+            setisSpin(false);
             createToast({
                 title: "Bilgi",
                 text: "Ürün başarıyla düzenlendi.",
@@ -81,6 +86,7 @@ function OrderAdmin() {
         onSuccess: () => {
             queryClient.invalidateQueries(["order", order_id]);
             queryClient.refetchQueries(["order", order_id]);
+            setisSpin(false);
             createToast({
                 title: "Bilgi",
                 text: "Ürün başarıyla düzenlendi.",
@@ -116,6 +122,7 @@ function OrderAdmin() {
             _id: "",
         },
         onSubmit: async (values, bag) => {
+            setisSpin(true);
             const prepareValues = {
                 ...values,
                 products: [...values.products],
@@ -167,7 +174,6 @@ function OrderAdmin() {
     useEffect(() => {
         if (data && data.length > 0) {
             if (JSON.stringify(data[0]) !== JSON.stringify(formik.values)) {
-                console.log("tekrar");
                 formik.setValues(data[0]);
             }
         }
@@ -234,7 +240,20 @@ function OrderAdmin() {
     }, [formik.values.products]);
 
     if (isLoading || !data[0]._id) {
-        return <div>Yükleniyor...</div>;
+        return (
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin size="large">
+                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+                </Spin>
+            </ConfigProvider>
+        );
     }
 
     if (isError) {
@@ -265,6 +284,7 @@ function OrderAdmin() {
             "İade almak istediğiniz ürün adedini giriniz.",
             product.return === 0 ? product.piece : product.return
         );
+        setisSpin(true);
         returnMutation.mutate({
             productId: product._id,
             count: returnCount,
@@ -273,6 +293,7 @@ function OrderAdmin() {
     };
 
     const handleSearchChange = (selectedOption) => {
+        setisSpin(true);
         addProductMutation.mutate({
             product_id: selectedOption.value._id || "0",
             orderId: order_id,
@@ -311,11 +332,13 @@ function OrderAdmin() {
                 status: false,
             },
         ]);
+        setisSpin(true);
         addProductMutation.mutate({
             product_id: "0",
             orderId: order_id,
             name: name,
         });
+        setkeyword("");
     };
 
     const msgStyles = {
@@ -372,423 +395,43 @@ function OrderAdmin() {
                 </Table>
             </Row>
             <Row>
-                <p>
-                    <b>Siparişler:</b>
-                </p>
-                {(formik.values.status === 1 || formik.values.status === 3) && (
-                    <Form.Group
-                        className="mb-3"
-                        controlId="exampleForm.ControlInput1"
-                    >
-                        <Form.Label>Ürün ekle:</Form.Label>
-                        <Select
-                            value={keyword}
-                            components={{ NoOptionsMessage }}
-                            styles={{
-                                noOptionsMessage: (base) => ({
-                                    ...base,
-                                    ...msgStyles,
-                                }),
-                            }}
-                            onChange={handleSearchChange}
-                            onInputChange={handleInputChange}
-                            options={options}
-                            placeholder="Listeye eklemek istediğiniz ürünü giriniz."
-                        />
-                    </Form.Group>
-                )}
+                <ConfigProvider
+                    theme={{
+                        token: {
+                            colorPrimary: "red",
+                            controlHeightLG: 200,
+                        },
+                    }}
+                >
+                    <Spin spinning={isSpin} size="large">
+                        <p>
+                            <b>Siparişler:</b>
+                        </p>
+                        {(formik.values.status === 1 ||
+                            formik.values.status === 3) && (
+                            <Form.Group
+                                className="mb-3"
+                                controlId="exampleForm.ControlInput1"
+                            >
+                                <Form.Label>Ürün ekle:</Form.Label>
+                                <Select
+                                    value={keyword}
+                                    components={{ NoOptionsMessage }}
+                                    styles={{
+                                        noOptionsMessage: (base) => ({
+                                            ...base,
+                                            ...msgStyles,
+                                        }),
+                                    }}
+                                    onChange={handleSearchChange}
+                                    onInputChange={handleInputChange}
+                                    options={options}
+                                    placeholder="Listeye eklemek istediğiniz ürünü giriniz."
+                                />
+                            </Form.Group>
+                        )}
 
-                <Form noValidate onSubmit={formik.handleSubmit}>
-                    <Table
-                        striped
-                        responsive
-                        bordered
-                        hover
-                        style={{ minWidth: 800 }}
-                    >
-                        <thead>
-                            <tr>
-                                <th style={{ minWidth: 250 }}>Ürün Adı</th>
-                                <th className="col-lg-2">Adet</th>
-                                {(formik.values.status === 1 ||
-                                    formik.values.status === 3) && (
-                                    <>
-                                        <th className="col-lg-2">Ham Fiyat</th>
-                                        <th className="col-lg-2">
-                                            Para Birimi
-                                        </th>
-                                        <th className="col-lg-2">Çarpan</th>
-                                    </>
-                                )}
-
-                                <th className="col-lg-2">Fiyat (TL)</th>
-                                <th className="col-lg-2">Tutar (TL)</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {formik.values.products.map(
-                                (product, key) =>
-                                    product.piece > 0 && (
-                                        <tr
-                                            key={key}
-                                            className={
-                                                !product.status
-                                                    ? "table-danger"
-                                                    : ""
-                                            }
-                                        >
-                                            <td>
-                                                {product.status ? (
-                                                    product.name
-                                                ) : (
-                                                    <Form.Control
-                                                        name={`products.${key}.name`}
-                                                        onChange={
-                                                            formik.handleChange
-                                                        }
-                                                        onBlur={
-                                                            formik.handleBlur
-                                                        }
-                                                        value={
-                                                            formik.values
-                                                                .products?.[key]
-                                                                ?.name || ""
-                                                        }
-                                                    />
-                                                )}
-                                            </td>
-                                            <td style={{ width: 40 }}>
-                                                <Form.Control
-                                                    name={`products.${key}.piece`}
-                                                    isValid={
-                                                        formik.touched
-                                                            .products?.[key]
-                                                            ?.piece &&
-                                                        !formik.errors
-                                                            .products?.[key]
-                                                            ?.piece
-                                                    }
-                                                    isInvalid={
-                                                        formik.touched
-                                                            .products?.[key]
-                                                            ?.piece &&
-                                                        formik.errors
-                                                            .products?.[key]
-                                                            ?.piece
-                                                    }
-                                                    onChange={
-                                                        formik.handleChange
-                                                    }
-                                                    onBlur={formik.handleBlur}
-                                                    value={
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.piece
-                                                    }
-                                                />
-                                            </td>
-                                            {(formik.values.status === 1 ||
-                                                formik.values.status === 3) && (
-                                                <>
-                                                    <td
-                                                        style={{
-                                                            width: 110,
-                                                        }}
-                                                    >
-                                                        <Form.Control
-                                                            disabled={
-                                                                (formik.values
-                                                                    .status ===
-                                                                    2 ||
-                                                                    formik
-                                                                        .values
-                                                                        .status ===
-                                                                        4 ||
-                                                                    formik
-                                                                        .values
-                                                                        .status ===
-                                                                        5 ||
-                                                                    formik
-                                                                        .values
-                                                                        .status ===
-                                                                        6) &&
-                                                                true
-                                                            }
-                                                            type="text"
-                                                            name={`products.${key}.exact_price`}
-                                                            isValid={
-                                                                formik.touched
-                                                                    .products?.[
-                                                                    key
-                                                                ]
-                                                                    ?.exact_price &&
-                                                                !formik.errors
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            }
-                                                            isInvalid={
-                                                                formik.touched
-                                                                    .products?.[
-                                                                    key
-                                                                ]
-                                                                    ?.exact_price &&
-                                                                formik.errors
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            }
-                                                            onChange={
-                                                                formik.handleChange
-                                                            }
-                                                            onBlur={
-                                                                formik.handleBlur
-                                                            }
-                                                            value={
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.exact_price
-                                                            }
-                                                        />
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            width: 80,
-                                                        }}
-                                                    >
-                                                        <Form.Select
-                                                            name={`products.${key}.currency`}
-                                                            onChange={
-                                                                formik.handleChange
-                                                            }
-                                                            onBlur={
-                                                                formik.handleBlur
-                                                            }
-                                                            value={
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.currency ||
-                                                                "TL"
-                                                            }
-                                                        >
-                                                            <option value="TL">
-                                                                TL
-                                                            </option>
-                                                            <option value="DOLAR">
-                                                                DOLAR
-                                                            </option>
-                                                            <option value="EURO">
-                                                                EURO
-                                                            </option>
-                                                        </Form.Select>
-                                                    </td>
-                                                    <td
-                                                        style={{
-                                                            width: 110,
-                                                        }}
-                                                    >
-                                                        <Form.Control
-                                                            disabled={
-                                                                (formik.values
-                                                                    .status ===
-                                                                    2 ||
-                                                                    formik
-                                                                        .values
-                                                                        .status ===
-                                                                        4 ||
-                                                                    formik
-                                                                        .values
-                                                                        .status ===
-                                                                        5 ||
-                                                                    formik
-                                                                        .values
-                                                                        .status ===
-                                                                        6) &&
-                                                                true
-                                                            }
-                                                            type="number"
-                                                            name={`products.${key}.factor`}
-                                                            isValid={
-                                                                formik.touched
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.factor &&
-                                                                !formik.errors
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.factor
-                                                            }
-                                                            isInvalid={
-                                                                formik.touched
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.factor &&
-                                                                formik.errors
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.factor
-                                                            }
-                                                            onChange={
-                                                                formik.handleChange
-                                                            }
-                                                            onBlur={
-                                                                formik.handleBlur
-                                                            }
-                                                            value={
-                                                                formik.values
-                                                                    .products?.[
-                                                                    key
-                                                                ]?.factor
-                                                            }
-                                                        />
-                                                    </td>
-                                                </>
-                                            )}
-
-                                            <td style={{ width: 110 }}>
-                                                <Form.Control
-                                                    disabled
-                                                    type="number"
-                                                    name={`products.${key}.price`}
-                                                    isValid={
-                                                        formik.touched
-                                                            .products?.[key]
-                                                            ?.price &&
-                                                        !formik.errors
-                                                            .products?.[key]
-                                                            ?.price
-                                                    }
-                                                    isInvalid={
-                                                        formik.touched
-                                                            .products?.[key]
-                                                            ?.price &&
-                                                        formik.errors
-                                                            .products?.[key]
-                                                            ?.price
-                                                    }
-                                                    onChange={
-                                                        formik.handleChange
-                                                    }
-                                                    onBlur={formik.handleBlur}
-                                                    value={
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.price
-                                                    }
-                                                />
-                                            </td>
-                                            <td style={{ width: 110 }}>
-                                                <Form.Control
-                                                    disabled
-                                                    type="number"
-                                                    name={`products.${key}.last_price`}
-                                                    isValid={
-                                                        formik.touched
-                                                            .products?.[key]
-                                                            ?.last_price &&
-                                                        !formik.errors
-                                                            .products?.[key]
-                                                            ?.last_price
-                                                    }
-                                                    isInvalid={
-                                                        formik.touched
-                                                            .products?.[key]
-                                                            ?.last_price &&
-                                                        formik.errors
-                                                            .products?.[key]
-                                                            ?.last_price
-                                                    }
-                                                    onChange={
-                                                        formik.handleChange
-                                                    }
-                                                    onBlur={formik.handleBlur}
-                                                    value={
-                                                        formik.values
-                                                            .products?.[key]
-                                                            ?.last_price
-                                                    }
-                                                />
-                                            </td>
-                                            <td>
-                                                {formik.values.status === 6 && (
-                                                    <Button
-                                                        variant="primary"
-                                                        onClick={() =>
-                                                            handleReturn(
-                                                                product,
-                                                                formik.values
-                                                                    ._id
-                                                            )
-                                                        }
-                                                    >
-                                                        İade Al
-                                                    </Button>
-                                                )}
-                                                {formik.values.status > 0 &&
-                                                    formik.values.status <
-                                                        6 && (
-                                                        <Button
-                                                            onClick={() =>
-                                                                deleteMutation.mutate(
-                                                                    {
-                                                                        productId:
-                                                                            product._id,
-                                                                        orderId:
-                                                                            formik
-                                                                                .values
-                                                                                ._id,
-                                                                    }
-                                                                )
-                                                            }
-                                                            variant="danger"
-                                                        >
-                                                            Sil
-                                                        </Button>
-                                                    )}
-                                                {formik.values.status === 6 &&
-                                                    product.status === 2 &&
-                                                    "İade istendi"}
-                                            </td>
-                                        </tr>
-                                    )
-                            )}
-                            <tr>
-                                {(formik.values.status === 1 ||
-                                    formik.values.status === 3) && (
-                                    <>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </>
-                                )}
-
-                                <td></td>
-                                <td></td>
-                                <td>Toplam tutar (TL):</td>
-                                <td>
-                                    <Form.Control
-                                        disabled
-                                        type="number"
-                                        value={totalPrice}
-                                        onChange={formik.handleChange}
-                                        name={`total_price`}
-                                        onBlur={formik.handleBlur}
-                                    />
-                                </td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                    {formik.values.products.some(
-                        (product) => product.return !== 0
-                    ) && (
-                        <>
-                            <p>
-                                <b>İadeler:</b>
-                            </p>
+                        <Form noValidate onSubmit={formik.handleSubmit}>
                             <Table
                                 striped
                                 responsive
@@ -798,47 +441,510 @@ function OrderAdmin() {
                             >
                                 <thead>
                                     <tr>
-                                        <th>Ürün Adı</th>
-                                        <th>Adet</th>
-                                        <th>Fiyat (TL)</th>
-                                        <th>Tutar (TL)</th>
+                                        <th style={{ minWidth: 250 }}>
+                                            Ürün Adı
+                                        </th>
+                                        <th className="col-lg-2">Adet</th>
+                                        {(formik.values.status === 1 ||
+                                            formik.values.status === 3) && (
+                                            <>
+                                                <th className="col-lg-2">
+                                                    Ham Fiyat
+                                                </th>
+                                                <th className="col-lg-2">
+                                                    Para Birimi
+                                                </th>
+                                                <th className="col-lg-2">
+                                                    Çarpan
+                                                </th>
+                                            </>
+                                        )}
+
+                                        <th className="col-lg-2">Fiyat (TL)</th>
+                                        <th className="col-lg-2">Tutar (TL)</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {formik.values.products.map(
                                         (product, key) =>
-                                            product.return > 0 && (
-                                                <tr key={key}>
-                                                    <td>{product.name}</td>
-                                                    <td>{product.return}</td>
-                                                    <td>{product.price}</td>
+                                            product.piece > 0 && (
+                                                <tr
+                                                    key={key}
+                                                    className={
+                                                        !product.status
+                                                            ? "table-danger"
+                                                            : ""
+                                                    }
+                                                >
                                                     <td>
-                                                        {product.price *
-                                                            product.return}
+                                                        {product.status ? (
+                                                            product.name
+                                                        ) : (
+                                                            <Form.Control
+                                                                name={`products.${key}.name`}
+                                                                onChange={
+                                                                    formik.handleChange
+                                                                }
+                                                                onBlur={
+                                                                    formik.handleBlur
+                                                                }
+                                                                value={
+                                                                    formik
+                                                                        .values
+                                                                        .products?.[
+                                                                        key
+                                                                    ]?.name ||
+                                                                    ""
+                                                                }
+                                                            />
+                                                        )}
+                                                    </td>
+                                                    <td style={{ width: 40 }}>
+                                                        <Form.Control
+                                                            name={`products.${key}.piece`}
+                                                            isValid={
+                                                                formik.touched
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.piece &&
+                                                                !formik.errors
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.piece
+                                                            }
+                                                            isInvalid={
+                                                                formik.touched
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.piece &&
+                                                                formik.errors
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.piece
+                                                            }
+                                                            onChange={
+                                                                formik.handleChange
+                                                            }
+                                                            onBlur={
+                                                                formik.handleBlur
+                                                            }
+                                                            value={
+                                                                formik.values
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.piece
+                                                            }
+                                                        />
+                                                    </td>
+                                                    {(formik.values.status ===
+                                                        1 ||
+                                                        formik.values.status ===
+                                                            3) && (
+                                                        <>
+                                                            <td
+                                                                style={{
+                                                                    width: 110,
+                                                                }}
+                                                            >
+                                                                <Form.Control
+                                                                    disabled={
+                                                                        (formik
+                                                                            .values
+                                                                            .status ===
+                                                                            2 ||
+                                                                            formik
+                                                                                .values
+                                                                                .status ===
+                                                                                4 ||
+                                                                            formik
+                                                                                .values
+                                                                                .status ===
+                                                                                5 ||
+                                                                            formik
+                                                                                .values
+                                                                                .status ===
+                                                                                6) &&
+                                                                        true
+                                                                    }
+                                                                    type="text"
+                                                                    name={`products.${key}.exact_price`}
+                                                                    isValid={
+                                                                        formik
+                                                                            .touched
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.exact_price &&
+                                                                        !formik
+                                                                            .errors
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.exact_price
+                                                                    }
+                                                                    isInvalid={
+                                                                        formik
+                                                                            .touched
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.exact_price &&
+                                                                        formik
+                                                                            .errors
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.exact_price
+                                                                    }
+                                                                    onChange={
+                                                                        formik.handleChange
+                                                                    }
+                                                                    onBlur={
+                                                                        formik.handleBlur
+                                                                    }
+                                                                    value={
+                                                                        formik
+                                                                            .values
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.exact_price
+                                                                    }
+                                                                />
+                                                            </td>
+                                                            <td
+                                                                style={{
+                                                                    width: 80,
+                                                                }}
+                                                            >
+                                                                <Form.Select
+                                                                    name={`products.${key}.currency`}
+                                                                    onChange={
+                                                                        formik.handleChange
+                                                                    }
+                                                                    onBlur={
+                                                                        formik.handleBlur
+                                                                    }
+                                                                    value={
+                                                                        formik
+                                                                            .values
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.currency ||
+                                                                        "TL"
+                                                                    }
+                                                                >
+                                                                    <option value="TL">
+                                                                        TL
+                                                                    </option>
+                                                                    <option value="DOLAR">
+                                                                        DOLAR
+                                                                    </option>
+                                                                    <option value="EURO">
+                                                                        EURO
+                                                                    </option>
+                                                                </Form.Select>
+                                                            </td>
+                                                            <td
+                                                                style={{
+                                                                    width: 110,
+                                                                }}
+                                                            >
+                                                                <Form.Control
+                                                                    disabled={
+                                                                        (formik
+                                                                            .values
+                                                                            .status ===
+                                                                            2 ||
+                                                                            formik
+                                                                                .values
+                                                                                .status ===
+                                                                                4 ||
+                                                                            formik
+                                                                                .values
+                                                                                .status ===
+                                                                                5 ||
+                                                                            formik
+                                                                                .values
+                                                                                .status ===
+                                                                                6) &&
+                                                                        true
+                                                                    }
+                                                                    type="number"
+                                                                    name={`products.${key}.factor`}
+                                                                    isValid={
+                                                                        formik
+                                                                            .touched
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.factor &&
+                                                                        !formik
+                                                                            .errors
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.factor
+                                                                    }
+                                                                    isInvalid={
+                                                                        formik
+                                                                            .touched
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.factor &&
+                                                                        formik
+                                                                            .errors
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.factor
+                                                                    }
+                                                                    onChange={
+                                                                        formik.handleChange
+                                                                    }
+                                                                    onBlur={
+                                                                        formik.handleBlur
+                                                                    }
+                                                                    value={
+                                                                        formik
+                                                                            .values
+                                                                            .products?.[
+                                                                            key
+                                                                        ]
+                                                                            ?.factor
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+
+                                                    <td style={{ width: 110 }}>
+                                                        <Form.Control
+                                                            disabled
+                                                            type="number"
+                                                            name={`products.${key}.price`}
+                                                            isValid={
+                                                                formik.touched
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.price &&
+                                                                !formik.errors
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.price
+                                                            }
+                                                            isInvalid={
+                                                                formik.touched
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.price &&
+                                                                formik.errors
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.price
+                                                            }
+                                                            onChange={
+                                                                formik.handleChange
+                                                            }
+                                                            onBlur={
+                                                                formik.handleBlur
+                                                            }
+                                                            value={
+                                                                formik.values
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.price
+                                                            }
+                                                        />
+                                                    </td>
+                                                    <td style={{ width: 110 }}>
+                                                        <Form.Control
+                                                            disabled
+                                                            type="number"
+                                                            name={`products.${key}.last_price`}
+                                                            isValid={
+                                                                formik.touched
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.last_price &&
+                                                                !formik.errors
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.last_price
+                                                            }
+                                                            isInvalid={
+                                                                formik.touched
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.last_price &&
+                                                                formik.errors
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.last_price
+                                                            }
+                                                            onChange={
+                                                                formik.handleChange
+                                                            }
+                                                            onBlur={
+                                                                formik.handleBlur
+                                                            }
+                                                            value={
+                                                                formik.values
+                                                                    .products?.[
+                                                                    key
+                                                                ]?.last_price
+                                                            }
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        {formik.values
+                                                            .status === 6 && (
+                                                            <Button
+                                                                variant="primary"
+                                                                onClick={() =>
+                                                                    handleReturn(
+                                                                        product,
+                                                                        formik
+                                                                            .values
+                                                                            ._id
+                                                                    )
+                                                                }
+                                                            >
+                                                                İade Al
+                                                            </Button>
+                                                        )}
+                                                        {formik.values.status >
+                                                            0 &&
+                                                            formik.values
+                                                                .status < 6 && (
+                                                                <Button
+                                                                    onClick={() =>
+                                                                        deleteMutation.mutate(
+                                                                            {
+                                                                                productId:
+                                                                                    product._id,
+                                                                                orderId:
+                                                                                    formik
+                                                                                        .values
+                                                                                        ._id,
+                                                                            }
+                                                                        )
+                                                                    }
+                                                                    variant="danger"
+                                                                >
+                                                                    Sil
+                                                                </Button>
+                                                            )}
+                                                        {formik.values
+                                                            .status === 6 &&
+                                                            product.status ===
+                                                                2 &&
+                                                            "İade istendi"}
                                                     </td>
                                                 </tr>
                                             )
                                     )}
+                                    <tr>
+                                        {(formik.values.status === 1 ||
+                                            formik.values.status === 3) && (
+                                            <>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </>
+                                        )}
+
+                                        <td></td>
+                                        <td></td>
+                                        <td>Toplam tutar (TL):</td>
+                                        <td>
+                                            <Form.Control
+                                                disabled
+                                                type="number"
+                                                value={totalPrice}
+                                                onChange={formik.handleChange}
+                                                name={`total_price`}
+                                                onBlur={formik.handleBlur}
+                                            />
+                                        </td>
+                                        <td></td>
+                                    </tr>
                                 </tbody>
                             </Table>
-                        </>
-                    )}
-                    {formik.values.status !== 6 && (
-                        <Button
-                            type="submit"
-                            disabled={formik.values.status === 2 && true}
-                        >
-                            {formik.values.status === 1 && "Teklif Gönder"}
-                            {formik.values.status === 2 && "Onay Bekleniyor"}
-                            {formik.values.status === 3 && "Siparişi Al"}
-                            {formik.values.status === 4 && "Teslimata Gönder"}
-                            {formik.values.status === 5 && "Teslim Et"}
-                        </Button>
-                    )}
-                    {/* <Button onClick={() => console.log(formik.values)}>
+                            {formik.values.products.some(
+                                (product) => product.return !== 0
+                            ) && (
+                                <>
+                                    <p>
+                                        <b>İadeler:</b>
+                                    </p>
+                                    <Table
+                                        striped
+                                        responsive
+                                        bordered
+                                        hover
+                                        style={{ minWidth: 800 }}
+                                    >
+                                        <thead>
+                                            <tr>
+                                                <th>Ürün Adı</th>
+                                                <th>Adet</th>
+                                                <th>Fiyat (TL)</th>
+                                                <th>Tutar (TL)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {formik.values.products.map(
+                                                (product, key) =>
+                                                    product.return > 0 && (
+                                                        <tr key={key}>
+                                                            <td>
+                                                                {product.name}
+                                                            </td>
+                                                            <td>
+                                                                {product.return}
+                                                            </td>
+                                                            <td>
+                                                                {product.price}
+                                                            </td>
+                                                            <td>
+                                                                {product.price *
+                                                                    product.return}
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                            )}
+                                        </tbody>
+                                    </Table>
+                                </>
+                            )}
+                            {formik.values.status !== 6 && (
+                                <Button
+                                    type="submit"
+                                    disabled={
+                                        formik.values.status === 2 && true
+                                    }
+                                >
+                                    {formik.values.status === 1 &&
+                                        "Teklif Gönder"}
+                                    {formik.values.status === 2 &&
+                                        "Onay Bekleniyor"}
+                                    {formik.values.status === 3 &&
+                                        "Siparişi Al"}
+                                    {formik.values.status === 4 &&
+                                        "Teslimata Gönder"}
+                                    {formik.values.status === 5 && "Teslim Et"}
+                                </Button>
+                            )}
+                            {/* <Button onClick={() => console.log(formik.values)}>
                         Test
                     </Button> */}
-                </Form>
+                        </Form>
+                    </Spin>
+                </ConfigProvider>
             </Row>
         </Container>
     );

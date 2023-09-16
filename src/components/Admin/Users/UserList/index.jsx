@@ -6,13 +6,9 @@ import { useNavigate } from "react-router-dom";
 function UserList({ userKeyword }) {
     const navigate = useNavigate();
 
-    const { data, status } = useQuery(["users", userKeyword], () =>
+    const { data, status, loading } = useQuery(["users", userKeyword], () =>
         fetchSearchUsersAdmin(userKeyword)
     );
-
-    if (status === "loading") return "yükleniyor...";
-
-    if (status === "error") return "Sipariş bulunamadı.";
 
     const columns = [
         {
@@ -55,6 +51,7 @@ function UserList({ userKeyword }) {
 
     return (
         <Table
+            loading={status === "loading"}
             style={{ marginTop: "10px" }}
             /* onRow={(record) => {
                         return {
@@ -68,10 +65,14 @@ function UserList({ userKeyword }) {
                         position: ["topRight"],
                     }} */
             columns={columns}
-            dataSource={data.map((item) => ({
-                ...item,
-                key: item._id,
-            }))}
+            dataSource={
+                status !== "loading" &&
+                status !== "error" &&
+                data.map((item) => ({
+                    ...item,
+                    key: item._id,
+                }))
+            }
         />
     );
 }

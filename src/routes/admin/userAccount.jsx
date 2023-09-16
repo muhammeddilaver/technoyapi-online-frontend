@@ -21,9 +21,9 @@ function UserAccount() {
         queries: {
             refetchOnMount: true,
             refetchOnWindowFocus: true,
-        }
+        },
     });
-    
+
     const addPaymentMutation = useMutation(createPayment, {
         onSuccess: (val) => {
             queryClient.invalidateQueries(["account", user_id]);
@@ -49,8 +49,9 @@ function UserAccount() {
         () => fetchAccount(user_id)
     );
 
-    const { data: userData } = useQuery(["user", user_id], () =>
-        userFetch(user_id)
+    const { data: userData, isLoading: userLoading } = useQuery(
+        ["user", user_id],
+        () => userFetch(user_id)
     );
 
     const {
@@ -59,14 +60,6 @@ function UserAccount() {
         data: balanceData,
         error: balanceError,
     } = useQuery(["balance", user_id], () => getBalance(user_id));
-
-    if (isLoading || balanceIsLoading) {
-        return <div>Yükleniyor...</div>;
-    }
-
-    if (isError || balanceIsError) {
-        return <div>Sipariş bulunamadı</div>;
-    }
 
     const showModal = () => {
         setOpen(true);
@@ -184,7 +177,7 @@ function UserAccount() {
                             <Form.Item
                                 label=""
                                 name="user_id"
-                                initialValue={userData._id}
+                                initialValue={!userLoading && userData._id}
                             >
                                 <Input type="hidden" />
                             </Form.Item>
@@ -217,10 +210,13 @@ function UserAccount() {
                         </Form>
                     </Modal>
                 </h2>
-                <h3>{userData.name + " - " + userData.company_name}</h3>
+                {!userLoading && (
+                    <h3>{userData.name + " - " + userData.company_name}</h3>
+                )}
             </Row>
             <Row className="flex-nowrap overflow-auto">
                 <Table
+                    loading={isLoading}
                     onRow={(record) => {
                         return {
                             onClick: () => {
@@ -233,32 +229,37 @@ function UserAccount() {
                         position: ["topRight"],
                     }} */
                     columns={columns}
-                    dataSource={data.map((item) => ({
-                        ...item,
-                        key: item._id,
-                    }))}
+                    dataSource={
+                        !isLoading &&
+                        data.map((item) => ({
+                            ...item,
+                            key: item._id,
+                        }))
+                    }
                 />
             </Row>
             <Row>
-                <Alert
-                    className="text-center"
-                    key={balanceData.result > 0 ? "danger" : "success"}
-                    variant={balanceData.result > 0 ? "danger" : "success"}
-                >
-                    {balanceData.result !== 0 &&
-                        format(
-                            balanceData.result *
-                                (balanceData.result < 0 ? -1 : 1),
-                            {
-                                currency: "₺",
-                                decimalSeparator: ",",
-                                thousandSeparator: ".",
-                            }
-                        )}
-                    {balanceData.result > 0 && " borcu bulunmaktadır."}
-                    {balanceData.result < 0 && " alacaklı."}
-                    {balanceData.result === 0 && "Borcu bulunmamaktadır."}
-                </Alert>
+                {!balanceIsLoading && (
+                    <Alert
+                        className="text-center"
+                        key={balanceData.result > 0 ? "danger" : "success"}
+                        variant={balanceData.result > 0 ? "danger" : "success"}
+                    >
+                        {balanceData.result !== 0 &&
+                            format(
+                                balanceData.result *
+                                    (balanceData.result < 0 ? -1 : 1),
+                                {
+                                    currency: "₺",
+                                    decimalSeparator: ",",
+                                    thousandSeparator: ".",
+                                }
+                            )}
+                        {balanceData.result > 0 && " borcu bulunmaktadır."}
+                        {balanceData.result < 0 && " alacaklı."}
+                        {balanceData.result === 0 && "Borcu bulunmamaktadır."}
+                    </Alert>
+                )}
             </Row>
         </Container>
     );

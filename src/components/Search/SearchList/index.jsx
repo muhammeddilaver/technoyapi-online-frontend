@@ -6,6 +6,7 @@ import { fetchSearchList } from "../../../api";
 
 import ProductCard from "../../ProductCard";
 import ProductRequest from "../../ProductRequest";
+import { ConfigProvider, Spin } from "antd";
 
 function SearchList({ keyword, setkeyword }) {
     const { ref, inView } = useInView();
@@ -44,9 +45,24 @@ function SearchList({ keyword, setkeyword }) {
         }
     }, [fetchNextPage, inView]);
 
-    if (status === "loading") return "yükleniyor...";
+    if (status === "loading")
+        return (
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin size="large">
+                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+                </Spin>
+            </ConfigProvider>
+        );
 
-    if (status === "error") return <ProductRequest keyword={keyword} setkeyword={ setkeyword} />;
+    if (status === "error")
+        return <ProductRequest keyword={keyword} setkeyword={setkeyword} />;
 
     return (
         <ListGroup as="ol">
@@ -62,9 +78,18 @@ function SearchList({ keyword, setkeyword }) {
                     ref={ref}
                     onClick={() => fetchNextPage()}
                     disabled={!hasNextPage || isFetchingNextPage}
-                    style={{ opacity: 0 }}
+                    style={{ margin: "auto" }}
                 >
-                    asdasd
+                    <ConfigProvider
+                        theme={{
+                            token: {
+                                colorPrimary: "red",
+                                controlHeightLG: 200,
+                            },
+                        }}
+                    >
+                        <Spin spinning={isFetchingNextPage} size="large"></Spin>
+                    </ConfigProvider>
                 </span>
             </div>
         </ListGroup>

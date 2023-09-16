@@ -5,11 +5,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOrder } from "../../api";
 import { useFormik } from "formik";
 import { basketValidations } from "../../validations/yup";
+import { ConfigProvider, Spin } from "antd";
+import { useState } from "react";
 
 function BasketNavbar({ handleClose }) {
     const { setitems, items, delFromBasket, changePieceFromBasket } =
         useBasket();
     const { createToast } = useToast();
+    const [isSpin, setisSpin] = useState(false);    
 
     const queryClient = useQueryClient();
 
@@ -21,6 +24,7 @@ function BasketNavbar({ handleClose }) {
             queryClient.refetchQueries("orderListAdmin");
             handleClose();
             setitems([]);
+            setisSpin(false);
             createToast({
                 title: "Bilgi",
                 text: "Siparişiniz oluşturuldu. Siparişler bölümünden takip edebilirsiniz.",
@@ -35,6 +39,7 @@ function BasketNavbar({ handleClose }) {
             status: 1,
         },
         onSubmit: async (values, bag) => {
+            setisSpin(true);
             createOrderMutation.mutate(values);
         },
         validationSchema: basketValidations,
@@ -42,6 +47,15 @@ function BasketNavbar({ handleClose }) {
 
     return (
         <Container>
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin spinning={isSpin} size="large">
             <Form noValidate onSubmit={formik.handleSubmit}>
                 <Table
                     striped
@@ -135,6 +149,8 @@ function BasketNavbar({ handleClose }) {
                 </Button>
                 {/* <Button onClick={() => console.log(formik.values)}>Test</Button> */}
             </Form>
+            </Spin>
+            </ConfigProvider>
         </Container>
     );
 }
