@@ -1,16 +1,17 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { Container, ListGroup } from "react-bootstrap";
-import React, { useEffect } from "react";
+import { Container } from "react-bootstrap";
+import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { fetchSearchList } from "../../../api";
-
-import ProductCard from "../../ProductCard";
 import ProductRequest from "../../ProductRequest";
-import { ConfigProvider, Spin } from "antd";
+import { Button, ConfigProvider, Spin, Table } from "antd";
+import { useBasket } from "../../../contexts/BasketContext";
 
 function SearchList({ keyword, setkeyword }) {
     const { ref, inView } = useInView();
     const queryClient = useQueryClient();
+
+    const { addToBasket, isInBasket } = useBasket();
 
     const {
         data,
@@ -40,10 +41,29 @@ function SearchList({ keyword, setkeyword }) {
     });
 
     useEffect(() => {
-        if (inView) {
+        if (inView && hasNextPage) {
             fetchNextPage();
         }
-    }, [fetchNextPage, inView]);
+    }, [fetchNextPage, inView, hasNextPage]);
+
+    const columns = [
+        {
+            title: "Ürün adı",
+            dataIndex: "name",
+            key: "name",
+        },
+        {
+            title: "",
+            dataIndex: "button",
+            key: "button",
+            align: "right",
+            render: (text, record) => (
+                <Button danger={true} type={isInBasket(record) ? "primary" : "default"} onClick={() => addToBasket(record, 1)}>
+                    {!isInBasket(record) ? "Sepete Ekle" : "Sepete Eklendi"}
+                </Button>
+            ),
+        },
+    ];
 
     if (status === "loading")
         return (
@@ -65,14 +85,34 @@ function SearchList({ keyword, setkeyword }) {
         return <ProductRequest keyword={keyword} setkeyword={setkeyword} />;
 
     return (
-        <ListGroup as="ol">
-            {data.pages.map((group, i) => (
-                <React.Fragment key={i}>
-                    {group.map((product, key) => (
-                        <ProductCard key={key} item={product} />
-                    ))}
-                </React.Fragment>
-            ))}
+        <>
+            <Table
+                loading={isFetching || isFetchingNextPage}
+                /* onRow={(record) => {
+                        return {
+                            onClick: () => {
+                                record.delivery_date &&
+                                    navigate(`/admin/${record._id}`);
+                            }, // click row
+                        };
+                    }} */
+                /* pagination={{
+                        position: ["topRight"],
+                    }} */
+                pagination={false}
+                columns={columns}
+                dataSource={
+                    status !== "loading" &&
+                    data.pages
+                        .map((page) =>
+                            page.map((item) => ({
+                                ...item,
+                                key: item._id,
+                            }))
+                        )
+                        .flat()
+                }
+            />
             <div>
                 <span
                     ref={ref}
@@ -92,7 +132,7 @@ function SearchList({ keyword, setkeyword }) {
                     </ConfigProvider>
                 </span>
             </div>
-        </ListGroup>
+        </>
     );
 }
 
