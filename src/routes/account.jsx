@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAccount, getBalance } from "../api";
 import { format } from "number-currency-format-2";
 import { useNavigate } from "react-router-dom";
-import { Table } from "antd";
+import { Breadcrumb, Space, Table } from "antd";
+import Title from "antd/es/typography/Title";
 
 function Account() {
     const navigate = useNavigate();
@@ -87,8 +88,27 @@ function Account() {
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
-                <h2>Hesap Dökümü</h2>
-                <Table className="flex-nowrap overflow-auto"
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/`)}>Anasayfa</a>
+                            ),
+                        },
+                        {
+                            title: "Hesap Dökümü",
+                        },
+                    ]}
+                />
+            </Row>
+            <Row className="mt-3">
+                <Space>
+                    <Title level={3} strong>
+                        Hesap Dökümü
+                    </Title>
+                </Space>
+                <Table
+                    className="flex-nowrap overflow-auto"
                     loading={isLoading}
                     onRow={(record) => {
                         return {

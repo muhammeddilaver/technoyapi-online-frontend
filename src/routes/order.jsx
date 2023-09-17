@@ -122,7 +122,7 @@ function Order() {
     }
 
     return (
-        <Container className="thumbnail">
+        <Container>
             <Row>
                 <Breadcrumb
                     items={[

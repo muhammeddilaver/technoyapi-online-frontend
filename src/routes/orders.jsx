@@ -170,7 +170,7 @@ function Orders() {
                     ]}
                 />
             </Row>
-            <Row className="mt-3">
+            <Row className="mt-4">
                 <Table
                     className="flex-nowrap overflow-auto"
                     loading={isFetching || isFetchingNextPage}
