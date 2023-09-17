@@ -59,7 +59,7 @@ export default function Root() {
                         <NavLink className="navbar-brand" to="/">
                             Techno Yapı
                         </NavLink>
-                        <Nav className="d-md-none justify-content-start flex-grow-1 pe-3">
+{/*                         <Nav className="d-md-none justify-content-start flex-grow-1 pe-3">
                             {items.length != 0 && (
                                 <Button
                                     variant="danger"
@@ -72,7 +72,7 @@ export default function Root() {
                                     </span>
                                 </Button>
                             )}
-                        </Nav>
+                        </Nav> */}
                         <Navbar.Toggle
                             onClick={toggleNavbar}
                             aria-controls={`offcanvasNavbar-expand-md`}
@@ -105,7 +105,7 @@ export default function Root() {
                                 </Nav>
 
                                 <Nav className="justify-content-end flex-grow-1 pe-3">
-                                    {items.length != 0 && (
+{/*                                     {items.length != 0 && (
                                         <Button
                                             variant="warning"
                                             className="me-1 d-none d-md-block"
@@ -116,7 +116,7 @@ export default function Root() {
                                                 <i className="fa fa-shopping-basket"></i>
                                             </span>
                                         </Button>
-                                    )}
+                                    )} */}
                                     <NavDropdown
                                         title={user && user.company_name}
                                         id="collasible-nav-dropdown"
@@ -180,14 +180,12 @@ export default function Root() {
                             },
                         }}
                     >
-                        <FloatButton
+                        <FloatButton                            
+                            icon={<ShoppingCartOutlined />}
                             badge={{
                                 count: items.length,
-                                align: "left",
                                 color: "purple",
                             }}
-                            tooltip={<div>Sepetim</div>}
-                            icon={<ShoppingCartOutlined />}
                             type="primary"
                             onClick={basketShowHandle}
                             style={{ width: 60, height: 60 }}

@@ -9,7 +9,7 @@ import {
 } from "../api";
 import { format } from "number-currency-format-2";
 import { useToast } from "../contexts/ToastContext";
-import { ConfigProvider, Spin } from "antd";
+import { ConfigProvider, Descriptions, Spin } from "antd";
 
 function Order() {
     const { order_id } = useParams();
@@ -40,27 +40,6 @@ function Order() {
         },
     });
 
-    if (isLoading) {
-        return (
-            <ConfigProvider
-                theme={{
-                    token: {
-                        colorPrimary: "red",
-                        controlHeightLG: 200,
-                    },
-                }}
-            >
-                <Spin size="large">
-                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
-                </Spin>
-            </ConfigProvider>
-        );
-    }
-
-    if (isError) {
-        return <div>Sipariş bulunamadı</div>;
-    }
-    
     const orderStatusMessage = (status) => {
         switch (status) {
             case 1:
@@ -80,10 +59,66 @@ function Order() {
         }
     };
 
+    if (isLoading) {
+        return (
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin size="large">
+                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+                </Spin>
+            </ConfigProvider>
+        );
+    }
+
+    const descriptionInfos = [
+        {
+            key: '1',
+            label: 'Alıcı Firma',
+            children: data[0].client.name + " " + data[0].client.company_name,
+        },
+        {
+            key: '2',
+            label: 'Sipariş Tarihi',
+            children: moment(data[0].order_date).format(
+                "DD.MM.YYYY HH:mm"
+            ),
+        },
+        {
+            key: '3',
+            label: 'Açıklama',
+            children: data[0].description,
+        },
+        {
+            key: '4',
+            label: 'Teslimat Tarihi',
+            children: data[0].delivery_date && moment(data[0].delivery_date).format(
+                "DD.MM.YYYY HH:mm"
+            ),
+        },
+        {
+            key: '5',
+            label: 'Durum',
+            children: orderStatusMessage(data[0].status),
+        }
+    ];
+
+    
+
+    if (isError) {
+        return <div>Sipariş bulunamadı</div>;
+    }
+
     return (
         <Container>
             <Row>
-                <Table striped responsive bordered hover>
+            <Descriptions layout="vertical" title="Sipariş Bilgileri" bordered items={descriptionInfos} />
+                {/* <Table striped responsive bordered>
                     <tbody>
                         <tr>
                             <td>Alıcı Firma</td>
@@ -116,7 +151,7 @@ function Order() {
                             <td>{orderStatusMessage(data[0].status)}</td>
                         </tr>
                     </tbody>
-                </Table>
+                </Table> */}
             </Row>
             <Row>
                 <p>

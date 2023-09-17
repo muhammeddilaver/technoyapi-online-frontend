@@ -42,7 +42,14 @@ function BasketNavbar({ handleClose }) {
         },
         onSubmit: async (values, bag) => {
             setisSpin(true);
-            createOrderMutation.mutate(values);
+            const updatedData = {
+                ...values,
+                products: values.products.map((product) => {
+                    const { key, ...rest } = product;
+                    return rest;
+                }),
+            };
+            createOrderMutation.mutate(updatedData);
         },
         validationSchema: basketValidations,
     });
@@ -107,77 +114,8 @@ function BasketNavbar({ handleClose }) {
                         <Table
                             pagination={false}
                             columns={columns}
-                            dataSource={items.map((item) => ({
-                                ...item,
-                                key: item._id,
-                            }))}
+                            dataSource={items}
                         />
-                        {/* <Table
-                            striped
-                            responsive
-                            bordered
-                            hover
-                            style={{ minWidth: 500 }}
-                        >
-                            <thead>
-                                <tr>
-                                    <th className="col-lg-1">#</th>
-                                    <th style={{ minWidth: 300 }}>Ürün adı</th>
-                                    <th className="col-lg-2 col-xs-6 col-sm-6">
-                                        Adet
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {items.map((item, key) => (
-                                    <tr key={key}>
-                                        <td style={{ width: 40 }}>{key + 1}</td>
-                                        <td>{item.name}</td>
-                                        <td style={{ width: 100 }}>
-                                            <Form.Control
-                                                name={`products.${key}.piece`}
-                                                isValid={
-                                                    formik.touched.products?.[
-                                                        key
-                                                    ]?.piece &&
-                                                    !formik.errors.products?.[
-                                                        key
-                                                    ]?.piece
-                                                }
-                                                isInvalid={
-                                                    formik.touched.products?.[
-                                                        key
-                                                    ]?.piece &&
-                                                    formik.errors.products?.[
-                                                        key
-                                                    ]?.piece
-                                                }
-                                                onChange={(e) => {
-                                                    formik.handleChange(e);
-                                                    changePieceFromBasket(
-                                                        item._id,
-                                                        e.target.value
-                                                    );
-                                                }}
-                                                onBlur={formik.handleBlur}
-                                                value={
-                                                    formik.values.products?.[
-                                                        key
-                                                    ]?.piece
-                                                }
-                                            />
-                                        </td>
-                                        <td style={{ width: 30 }}>
-                                            <CloseButton
-                                                onClick={() =>
-                                                    delFromBasket(item.name)
-                                                }
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table> */}
                         <Form.Group
                             className="mb-3"
                             controlId="exampleForm.ControlTextarea1"
