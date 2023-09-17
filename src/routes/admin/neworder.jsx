@@ -22,13 +22,20 @@ function NewOrder() {
     const [euro, setEuro] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
 
-    const { data: userData } = useQuery(["userSearch", userKeyword], () =>
-        fetchSearchUsersAdmin(userKeyword)
+    const { data: userData } = useQuery(
+        ["userSearch", userKeyword],
+        () => fetchSearchUsersAdmin(userKeyword),
+        {
+            retry: false,
+        }
     );
 
     const { data: productData } = useQuery(
         ["order", productKeyword],
-        fetchAdminSearchList
+        fetchAdminSearchList,
+        {
+            retry: false,
+        }
     );
 
     const queryClient = useQueryClient();

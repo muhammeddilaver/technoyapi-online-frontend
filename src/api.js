@@ -130,7 +130,7 @@ export const fetchOrdersList = async ({ pageParam = 1 }) => {
 
 export const fetchSearchUsersAdmin = async (keyword) => {
     if (keyword === "") {
-        keyword = "a";
+        keyword = "full";
     }
     const { data } = await axios.get(
         `${import.meta.env.VITE_BASE_ENDPOINT}/auth/users/search/${encodeURIComponent(keyword)}`

@@ -50,7 +50,9 @@ function OrderAdmin() {
         isError: searchIsError,
         data: searchData,
         error: searchError,
-    } = useQuery(["order", keyword], fetchAdminSearchList);
+    } = useQuery(["order", keyword], fetchAdminSearchList, {
+        retry: false,
+    });
 
     const { isLoading, isError, data, error } = useQuery(
         ["order", order_id],

@@ -6,8 +6,12 @@ import { useNavigate } from "react-router-dom";
 function UserList({ userKeyword }) {
     const navigate = useNavigate();
 
-    const { data, status, loading } = useQuery(["users", userKeyword], () =>
-        fetchSearchUsersAdmin(userKeyword)
+    const { data, isLoading, error } = useQuery(
+        ["users", userKeyword],
+        () => fetchSearchUsersAdmin(userKeyword),
+        {
+            retry: false,
+        }
     );
 
     const columns = [
@@ -51,23 +55,20 @@ function UserList({ userKeyword }) {
 
     return (
         <Table
-            loading={status === "loading"}
+            loading={isLoading}
             style={{ marginTop: "10px" }}
-            /* onRow={(record) => {
-                        return {
-                            onClick: () => {
-                                record.delivery_date &&
-                                    navigate(`/orders/${record._id}`);
-                            }, // click row
-                        };
-                    }} */
-            /* pagination={{
-                        position: ["topRight"],
-                    }} */
+            onRow={(record) => {
+                return {
+                    onClick: () => {
+                        navigate(`/admin/user/${record._id}/account`);
+                    }, // click row
+                };
+            }}
+            pagination={false}
             columns={columns}
             dataSource={
-                status !== "loading" &&
-                status !== "error" &&
+                !isLoading &&
+                !error &&
                 data.map((item) => ({
                     ...item,
                     key: item._id,
