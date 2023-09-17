@@ -117,7 +117,7 @@ function Order() {
     return (
         <Container>
             <Row>
-            <Descriptions layout="vertical" title="Sipariş Bilgileri" bordered items={descriptionInfos} />
+            <Descriptions title="Sipariş Bilgileri" bordered items={descriptionInfos} />
                 {/* <Table striped responsive bordered>
                     <tbody>
                         <tr>

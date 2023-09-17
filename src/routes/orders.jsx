@@ -155,9 +155,9 @@ function Orders() {
     };
 
     return (
-        <Container className="">
-            <>
+        <Container>
                 <Table
+                    className="flex-nowrap overflow-auto"
                     loading={isFetching || isFetchingNextPage}
                     pagination={false}
                     columns={columns}
