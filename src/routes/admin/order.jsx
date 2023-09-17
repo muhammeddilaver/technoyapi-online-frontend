@@ -1,4 +1,4 @@
-import { Button, Container, Form, Row, Table } from "react-bootstrap";
+import { Container, Form, Row, Table } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,8 +19,17 @@ import {
     neworderValidations,
     shortOrderAdminValidations,
 } from "../../validations/yup";
-import { Breadcrumb, ConfigProvider, Descriptions, Space, Spin } from "antd";
+import {
+    Breadcrumb,
+    Button,
+    ConfigProvider,
+    Descriptions,
+    Space,
+    Spin,
+    Tooltip,
+} from "antd";
 import Title from "antd/es/typography/Title";
+import { DeleteOutlined } from "@ant-design/icons";
 
 function OrderAdmin() {
     const { order_id } = useParams();
@@ -281,12 +290,17 @@ function OrderAdmin() {
         {
             key: "1",
             label: "Alıcı Firma",
-            children: formik.values.client.name + " " + formik.values.client.company_name,
+            children:
+                formik.values.client.name +
+                " " +
+                formik.values.client.company_name,
         },
         {
             key: "2",
             label: "Sipariş Tarihi",
-            children: moment(formik.values.order_date).format("DD.MM.YYYY HH:mm"),
+            children: moment(formik.values.order_date).format(
+                "DD.MM.YYYY HH:mm"
+            ),
         },
         {
             key: "3",
@@ -395,7 +409,9 @@ function OrderAdmin() {
                     items={[
                         {
                             title: (
-                                <a onClick={() => navigate(`/admin`)}>Tüm Siparişler</a>
+                                <a onClick={() => navigate(`/admin`)}>
+                                    Tüm Siparişler
+                                </a>
                             ),
                         },
                         {
@@ -451,13 +467,7 @@ function OrderAdmin() {
                         )}
 
                         <Form noValidate onSubmit={formik.handleSubmit}>
-                            <Table
-                                
-                                responsive
-                                
-                                hover
-                                style={{ minWidth: 900 }}
-                            >
+                            <Table responsive hover style={{ minWidth: 900 }}>
                                 <thead>
                                     <tr>
                                         <th style={{ minWidth: 250 }}>
@@ -814,23 +824,27 @@ function OrderAdmin() {
                                                     {formik.values.status > 0 &&
                                                         formik.values.status <
                                                             6 && (
-                                                            <Button
-                                                                onClick={() =>
-                                                                    deleteMutation.mutate(
-                                                                        {
-                                                                            productId:
-                                                                                product._id,
-                                                                            orderId:
-                                                                                formik
-                                                                                    .values
-                                                                                    ._id,
-                                                                        }
-                                                                    )
-                                                                }
-                                                                variant="danger"
-                                                            >
-                                                                Sil
-                                                            </Button>
+                                                            <Tooltip title="Sil">
+                                                                <Button
+                                                                    danger
+                                                                    type="primary"
+                                                                    onClick={() =>
+                                                                        deleteMutation.mutate(
+                                                                            {
+                                                                                productId:
+                                                                                    product._id,
+                                                                                orderId:
+                                                                                    formik
+                                                                                        .values
+                                                                                        ._id,
+                                                                            }
+                                                                        )
+                                                                    }
+                                                                    icon={
+                                                                        <DeleteOutlined />
+                                                                    }
+                                                                />
+                                                            </Tooltip>
                                                         )}
                                                     {formik.values.status ===
                                                         6 &&
@@ -916,10 +930,8 @@ function OrderAdmin() {
                             )}
                             {formik.values.status !== 6 && (
                                 <Button
-                                    type="submit"
-                                    disabled={
-                                        formik.values.status === 2 && true
-                                    }
+                                    type="primary"
+                                    onClick={formik.handleSubmit}
                                 >
                                     {formik.values.status === 1 &&
                                         "Teklif Gönder"}
