@@ -6,33 +6,35 @@ import { useToast } from "../contexts/ToastContext";
 
 const AdminRoutes = () => {
     const { loggedIn, user } = useAuth();
-	const { showToast, toastInfo, setshowToast } = useToast();
+    const { showToast, toastInfo, setshowToast } = useToast();
 
-	return (
-		<>
-			<AdminNavbar />
-			{(loggedIn && user.role == 'admin') ? <Outlet/> : <Navigate to="/" />}
-			<ToastContainer
-                    className="p-3"
-                    position="bottom-end"
-                    style={{ zIndex: 1, position: "fixed" }}
+    return (
+        <>
+            <AdminNavbar />
+            {loggedIn && user.role == "admin" ? (
+                <Outlet />
+            ) : (
+                <Navigate to="/" />
+            )}
+            <ToastContainer
+                className="p-3"
+                position="bottom-end"
+                style={{ zIndex: 1, position: "fixed" }}
+            >
+                <Toast
+                    onClose={() => setshowToast(false)}
+                    show={showToast}
+                    delay={5000}
+                    autohide
                 >
-                    <Toast
-                        onClose={() => setshowToast(false)}
-                        show={showToast}
-                        delay={5000}
-                        autohide
-                    >
-                        <Toast.Header>
-                            <strong className="me-auto">
-                                {toastInfo.title}
-                            </strong>
-                        </Toast.Header>
-                        <Toast.Body className="h5">{toastInfo.text}</Toast.Body>
-                    </Toast>
-                </ToastContainer>
-		</>
-	);
+                    <Toast.Header>
+                        <strong className="me-auto">{toastInfo.title}</strong>
+                    </Toast.Header>
+                    <Toast.Body className="h5">{toastInfo.text}</Toast.Body>
+                </Toast>
+            </ToastContainer>
+        </>
+    );
 };
 
 export default AdminRoutes;

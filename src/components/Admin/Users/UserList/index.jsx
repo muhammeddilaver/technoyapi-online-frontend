@@ -47,7 +47,6 @@ function UserList({ userKeyword }) {
                     >
                         Hesap Dökümü
                     </a>
-                    <a>Kullanıcıyı Düzenle</a>
                 </Space>
             ),
         },

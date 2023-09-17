@@ -20,7 +20,7 @@ const AuthProvider = ({ children }) => {
                 setloggedIn(true);
                 setuser(me);
                 setloading(false);
-                redirect('/');
+                redirect("/");
             } catch (error) {
                 setloading(false);
             }
@@ -41,8 +41,8 @@ const AuthProvider = ({ children }) => {
 
         await fetchLogout();
 
-        localStorage.removeItem('access-token');
-        localStorage.removeItem('refresh-token');
+        localStorage.removeItem("access-token");
+        localStorage.removeItem("refresh-token");
     };
 
     const values = {
@@ -53,17 +53,19 @@ const AuthProvider = ({ children }) => {
     };
 
     if (loading) {
-        return (<ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: "red",
-                controlHeightLG: 200
-              }
-            }}
-          >
-            <Spin size="large">
-                <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
-            </Spin></ConfigProvider>
+        return (
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "red",
+                        controlHeightLG: 200,
+                    },
+                }}
+            >
+                <Spin size="large">
+                    <Container className="min-vh-100 d-flex justify-content-center align-items-center"></Container>
+                </Spin>
+            </ConfigProvider>
         );
     }
 

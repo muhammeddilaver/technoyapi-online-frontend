@@ -1,12 +1,14 @@
-import { Alert, Button, Container, Row } from "react-bootstrap";
+import { Alert, Container, Row } from "react-bootstrap";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPayment, fetchAccount, getBalance, userFetch } from "../../api";
 import { format } from "number-currency-format-2";
 import { useNavigate, useParams } from "react-router-dom";
-import { Form, Input, Modal, Table } from "antd";
+import { Breadcrumb, Button, Form, Input, Modal, Space, Table } from "antd";
 import { useState } from "react";
 import { useToast } from "../../contexts/ToastContext";
+import { Resolution, Margin, usePDF } from "react-to-pdf";
+import Title from "antd/es/typography/Title";
 
 function UserAccount() {
     const navigate = useNavigate();
@@ -16,6 +18,7 @@ function UserAccount() {
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [form] = Form.useForm();
     const { createToast } = useToast();
+
     const queryClient = useQueryClient();
     queryClient.setDefaultOptions({
         queries: {
@@ -140,82 +143,142 @@ function UserAccount() {
         },
     ];
 
+    const pdfOptions = {
+        filename: "hesap-ozeti.pdf",
+        method: "save",
+        resolution: Resolution.MEDIUM,
+        page: {
+            margin: Margin.MEDIUM,
+            format: "letter",
+            orientation: "landscape",
+        },
+        canvas: {
+            mimeType: "image/jpeg",
+            qualityRatio: 1,
+        },
+        overrides: {
+            pdf: {
+                compress: true,
+            },
+            canvas: {
+                useCORS: true,
+            },
+        },
+    };
+
+    const { toPDF, targetRef } = usePDF(pdfOptions);
+
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
-                <h2>
-                    Hesap Dökümü{" "}
-                    <Button type="primary" className="mb-3" onClick={showModal}>
-                        Ödeme Al
-                    </Button>
-                    <Modal
-                        title="Yeni Ödeme Girişi"
-                        open={open}
-                        onOk={handleOk}
-                        okText="Gönder"
-                        cancelText="İptal"
-                        confirmLoading={confirmLoading}
-                        onCancel={handleCancel}
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/admin`)}>
+                                    Anasayfa
+                                </a>
+                            ),
+                        },
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/admin/users`)}>
+                                    Müşteriler
+                                </a>
+                            ),
+                        },
+                        {
+                            title: "Hesap Özeti",
+                        },
+                    ]}
+                />
+            </Row>
+            <Row className="mt-3">
+                <Space>
+                    <Title level={2} strong>
+                        Hesap Dökümü
+                    </Title>
+                    <Button
+                        type="primary"
+                        className="mb-3"
+                        onClick={() => toPDF()}
                     >
-                        <Form
-                            name="basic"
-                            form={form}
-                            labelCol={{
-                                span: 8,
-                            }}
-                            wrapperCol={{
-                                span: 16,
-                            }}
-                            style={{
-                                maxWidth: 600,
-                            }}
-                            initialValues={{
-                                remember: true,
-                            }}
-                            autoComplete="off"
+                        Çıktı al
+                    </Button>
+                </Space>
+                <Modal
+                    title="Yeni Ödeme Girişi"
+                    open={open}
+                    onOk={handleOk}
+                    okText="Gönder"
+                    cancelText="İptal"
+                    confirmLoading={confirmLoading}
+                    onCancel={handleCancel}
+                >
+                    <Form
+                        name="basic"
+                        form={form}
+                        labelCol={{
+                            span: 8,
+                        }}
+                        wrapperCol={{
+                            span: 16,
+                        }}
+                        style={{
+                            maxWidth: 600,
+                        }}
+                        initialValues={{
+                            remember: true,
+                        }}
+                        autoComplete="off"
+                    >
+                        <Form.Item
+                            label=""
+                            name="user_id"
+                            initialValue={!userLoading && userData._id}
                         >
-                            <Form.Item
-                                label=""
-                                name="user_id"
-                                initialValue={!userLoading && userData._id}
-                            >
-                                <Input type="hidden" />
-                            </Form.Item>
-                            <Form.Item
-                                label="Ödeme Tutarı"
-                                name="price"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message:
-                                            "Lütfen ödeme tutarını giriniz!",
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
-                            <Form.Item
-                                label="Açıklama"
-                                name="description"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message:
-                                            "Lütfen ödeme ile ilgili açıklama giriniz!",
-                                    },
-                                ]}
-                            >
-                                <Input />
-                            </Form.Item>
-                        </Form>
-                    </Modal>
-                </h2>
-                {!userLoading && (
-                    <h3>{userData.name + " - " + userData.company_name}</h3>
-                )}
+                            <Input type="hidden" />
+                        </Form.Item>
+                        <Form.Item
+                            label="Ödeme Tutarı"
+                            name="price"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Lütfen ödeme tutarını giriniz!",
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
+                        <Form.Item
+                            label="Açıklama"
+                            name="description"
+                            rules={[
+                                {
+                                    required: true,
+                                    message:
+                                        "Lütfen ödeme ile ilgili açıklama giriniz!",
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Form>
+                </Modal>
+                <Space>
+                    <Title level={3} strong>
+                        {!userLoading &&
+                            userData.name + " - " + userData.company_name}
+                    </Title>
+                    <Button type="primary" className="mb-3" onClick={showModal}>
+                        Yeni Ödeme
+                    </Button>
+                </Space>
             </Row>
             <Row className="flex-nowrap overflow-auto">
                 <Table
+                    ref={targetRef}
                     loading={isLoading}
                     onRow={(record) => {
                         return {
@@ -225,9 +288,7 @@ function UserAccount() {
                             }, // click row
                         };
                     }}
-                    /* pagination={{
-                        position: ["topRight"],
-                    }} */
+                    pagination={false}
                     columns={columns}
                     dataSource={
                         !isLoading &&
@@ -236,30 +297,40 @@ function UserAccount() {
                             key: item._id,
                         }))
                     }
-                />
-            </Row>
-            <Row>
-                {!balanceIsLoading && (
-                    <Alert
-                        className="text-center"
-                        key={balanceData.result > 0 ? "danger" : "success"}
-                        variant={balanceData.result > 0 ? "danger" : "success"}
-                    >
-                        {balanceData.result !== 0 &&
-                            format(
-                                balanceData.result *
-                                    (balanceData.result < 0 ? -1 : 1),
-                                {
-                                    currency: "₺",
-                                    decimalSeparator: ",",
-                                    thousandSeparator: ".",
+                    footer={() =>
+                        !balanceIsLoading && (
+                            <Alert
+                                className="text-center"
+                                key={
+                                    balanceData.result > 0
+                                        ? "danger"
+                                        : "success"
                                 }
-                            )}
-                        {balanceData.result > 0 && " borcu bulunmaktadır."}
-                        {balanceData.result < 0 && " alacaklı."}
-                        {balanceData.result === 0 && "Borcu bulunmamaktadır."}
-                    </Alert>
-                )}
+                                variant={
+                                    balanceData.result > 0
+                                        ? "danger"
+                                        : "success"
+                                }
+                            >
+                                {balanceData.result !== 0 &&
+                                    format(
+                                        balanceData.result *
+                                            (balanceData.result < 0 ? -1 : 1),
+                                        {
+                                            currency: "₺",
+                                            decimalSeparator: ",",
+                                            thousandSeparator: ".",
+                                        }
+                                    )}
+                                {balanceData.result > 0 &&
+                                    " borcu bulunmaktadır."}
+                                {balanceData.result < 0 && " alacaklı."}
+                                {balanceData.result === 0 &&
+                                    "Borcu bulunmamaktadır."}
+                            </Alert>
+                        )
+                    }
+                />
             </Row>
         </Container>
     );

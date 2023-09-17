@@ -12,6 +12,7 @@ import Select, { components } from "react-select";
 import { useToast } from "../../contexts/ToastContext";
 import { useNavigate } from "react-router-dom";
 import { neworderValidations } from "../../validations/yup";
+import { Breadcrumb } from "antd";
 
 function NewOrder() {
     const { createToast } = useToast();
@@ -180,6 +181,22 @@ function NewOrder() {
 
     return (
         <Container style={{ marginTop: 80 }}>
+            <Row>
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/admin`)}>
+                                    Tüm Siparişler
+                                </a>
+                            ),
+                        },
+                        {
+                            title: "Yeni Sipariş",
+                        },
+                    ]}
+                />
+            </Row>
             <Row>
                 <Form noValidate onSubmit={formik.handleSubmit}>
                     <Form.Group className="mb-3">
