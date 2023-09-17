@@ -203,7 +203,6 @@ function Orders() {
                         </ConfigProvider>
                     </span>
                 </div>
-            </>
         </Container>
     );
 }
