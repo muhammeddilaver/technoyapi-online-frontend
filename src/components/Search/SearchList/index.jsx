@@ -58,7 +58,11 @@ function SearchList({ keyword, setkeyword }) {
             key: "button",
             align: "right",
             render: (text, record) => (
-                <Button danger={true} type={isInBasket(record) ? "primary" : "default"} onClick={() => addToBasket(record, 1)}>
+                <Button
+                    danger={true}
+                    type={isInBasket(record) ? "primary" : "default"}
+                    onClick={() => addToBasket(record, 1)}
+                >
                     {!isInBasket(record) ? "Sepete Ekle" : "Sepete Eklendi"}
                 </Button>
             ),
@@ -88,17 +92,6 @@ function SearchList({ keyword, setkeyword }) {
         <>
             <Table
                 loading={isFetching || isFetchingNextPage}
-                /* onRow={(record) => {
-                        return {
-                            onClick: () => {
-                                record.delivery_date &&
-                                    navigate(`/admin/${record._id}`);
-                            }, // click row
-                        };
-                    }} */
-                /* pagination={{
-                        position: ["topRight"],
-                    }} */
                 pagination={false}
                 columns={columns}
                 dataSource={
@@ -118,7 +111,7 @@ function SearchList({ keyword, setkeyword }) {
                     ref={ref}
                     onClick={() => fetchNextPage()}
                     disabled={!hasNextPage || isFetchingNextPage}
-                    style={{ margin: "auto" }}
+                    className="d-flex justify-content-center align-items-center"
                 >
                     <ConfigProvider
                         theme={{
