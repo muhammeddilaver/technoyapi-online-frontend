@@ -1,5 +1,5 @@
-import { Button, Container, Row, Table } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { Container, Row, Table } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -9,11 +9,22 @@ import {
 } from "../api";
 import { format } from "number-currency-format-2";
 import { useToast } from "../contexts/ToastContext";
-import { ConfigProvider, Descriptions, Spin } from "antd";
+import {
+    Breadcrumb,
+    Button,
+    ConfigProvider,
+    Descriptions,
+    Space,
+    Spin,
+    Tooltip,
+} from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
+import Title from "antd/es/typography/Title";
 
 function Order() {
     const { order_id } = useParams();
     const { createToast } = useToast();
+    const navigate = useNavigate();
 
     const { isLoading, isError, data, error } = useQuery(
         ["order", order_id],
@@ -78,86 +89,75 @@ function Order() {
 
     const descriptionInfos = [
         {
-            key: '1',
-            label: 'Alıcı Firma',
+            key: "1",
+            label: "Alıcı Firma",
             children: data[0].client.name + " " + data[0].client.company_name,
         },
         {
-            key: '2',
-            label: 'Sipariş Tarihi',
-            children: moment(data[0].order_date).format(
-                "DD.MM.YYYY HH:mm"
-            ),
+            key: "2",
+            label: "Sipariş Tarihi",
+            children: moment(data[0].order_date).format("DD.MM.YYYY HH:mm"),
         },
         {
-            key: '3',
-            label: 'Açıklama',
+            key: "3",
+            label: "Açıklama",
             children: data[0].description,
         },
         {
-            key: '4',
-            label: 'Teslimat Tarihi',
-            children: data[0].delivery_date && moment(data[0].delivery_date).format(
-                "DD.MM.YYYY HH:mm"
-            ),
+            key: "4",
+            label: "Teslimat Tarihi",
+            children:
+                data[0].delivery_date &&
+                moment(data[0].delivery_date).format("DD.MM.YYYY HH:mm"),
         },
         {
-            key: '5',
-            label: 'Durum',
+            key: "5",
+            label: "Durum",
             children: orderStatusMessage(data[0].status),
-        }
+        },
     ];
-
-    
 
     if (isError) {
         return <div>Sipariş bulunamadı</div>;
     }
 
     return (
-        <Container>
+        <Container className="thumbnail">
             <Row>
-            <Descriptions title="Sipariş Bilgileri" bordered items={descriptionInfos} />
-                {/* <Table striped responsive bordered>
-                    <tbody>
-                        <tr>
-                            <td>Alıcı Firma</td>
-                            <td>{data[0].client.company_name}</td>
-                        </tr>
-                        <tr>
-                            <td>Sipariş Tarihi</td>
-                            <td>
-                                {moment(data[0].order_date).format(
-                                    "DD.MM.YYYY HH:mm"
-                                )}
-                            </td>
-                        </tr>
-                        {data[0].delivery_date && (
-                            <tr>
-                                <td>Teslimat Tarihi</td>
-                                <td>
-                                    {moment(data[0].order_date).format(
-                                        "DD.MM.YYYY HH:mm"
-                                    )}
-                                </td>
-                            </tr>
-                        )}
-                        <tr>
-                            <td>Açıklama</td>
-                            <td>{data[0].description}</td>
-                        </tr>
-                        <tr>
-                            <td>Durum</td>
-                            <td>{orderStatusMessage(data[0].status)}</td>
-                        </tr>
-                    </tbody>
-                </Table> */}
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/`)}>Anasayfa</a>
+                            ),
+                        },
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/orders/`)}>
+                                    Siparişler
+                                </a>
+                            ),
+                        },
+                        {
+                            title: "Sipariş detay",
+                        },
+                    ]}
+                />
             </Row>
-            <Row>
-                <p>
-                    <b>Siparişler:</b>
-                </p>
-                <Table striped responsive bordered hover>
+            <Row className="mt-3">
+                <Descriptions
+                    title="Sipariş Bilgileri"
+                    bordered
+                    items={descriptionInfos}
+                />
+            </Row>
+            <Row className="mt-4">
+                <Space>
+                    <Title level={5} strong>
+                        Siparişler
+                    </Title>
+                </Space>
+                <Table responsive hover>
                     <thead>
                         <tr>
                             <th>Ürün Adı</th>
@@ -200,34 +200,34 @@ function Order() {
                                             </>
                                         ) : (
                                             <>
-                                                <td>
-                                                    Onay bekleniyor...
-                                                </td>
-                                                <td>
-                                                    Onay bekleniyor...
-                                                </td>
+                                                <td>Onay bekleniyor...</td>
+                                                <td>Onay bekleniyor...</td>
                                             </>
                                         )}
 
                                         <td>
                                             {data[0].status > 0 &&
                                                 data[0].status < 6 && (
-                                                    <Button
-                                                        onClick={() =>
-                                                            deleteMutation.mutate(
-                                                                {
-                                                                    productId:
-                                                                        product._id,
-                                                                    orderId:
-                                                                        data[0]
-                                                                            ._id,
-                                                                }
-                                                            )
-                                                        }
-                                                        variant="danger"
-                                                    >
-                                                        Sil
-                                                    </Button>
+                                                    <Tooltip title="Sil">
+                                                        <Button
+                                                            danger
+                                                            type="primary"
+                                                            onClick={() =>
+                                                                deleteMutation.mutate(
+                                                                    {
+                                                                        productId:
+                                                                            product._id,
+                                                                        orderId:
+                                                                            data[0]
+                                                                                ._id,
+                                                                    }
+                                                                )
+                                                            }
+                                                            icon={
+                                                                <DeleteOutlined />
+                                                            }
+                                                        />
+                                                    </Tooltip>
                                                 )}
                                         </td>
                                     </tr>
@@ -237,7 +237,9 @@ function Order() {
                             <tr>
                                 <td></td>
                                 <td></td>
-                                <td><b>Toplam tutar:</b></td>
+                                <td>
+                                    <b>Toplam tutar:</b>
+                                </td>
                                 <td>
                                     {format(data[0].total_price, {
                                         currency: "₺",
@@ -252,10 +254,12 @@ function Order() {
                 </Table>
                 {data[0].products.some((product) => product.return !== 0) && (
                     <>
-                        <p>
-                            <b>İadeler:</b>
-                        </p>
-                        <Table striped responsive bordered hover>
+                        <Space>
+                            <Title level={5} strong>
+                                İadeler
+                            </Title>
+                        </Space>
+                        <Table responsive hover>
                             <thead>
                                 <tr>
                                     <th>Ürün Adı</th>
@@ -302,7 +306,7 @@ function Order() {
             {data[0].status === 2 && (
                 <>
                     <Button
-                        variant="primary"
+                        type="primary"
                         onClick={() =>
                             offerMutation.mutate({
                                 status: data[0].status,
@@ -313,7 +317,8 @@ function Order() {
                         Teklifi Onayla
                     </Button>
                     <Button
-                        variant="danger"
+                        danger
+                        type="primary"
                         className="ms-3"
                         onClick={() =>
                             offerMutation.mutate({

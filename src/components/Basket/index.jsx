@@ -1,5 +1,4 @@
-import { CloseButton, Container, Form } from "react-bootstrap";
-import Icon from "antd/lib/icon";
+import {  Container, Form } from "react-bootstrap";
 import { useBasket } from "../../contexts/BasketContext";
 import { useToast } from "../../contexts/ToastContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,7 +7,7 @@ import { useFormik } from "formik";
 import { basketValidations } from "../../validations/yup";
 import { ConfigProvider, Spin, Table, Tooltip, Button } from "antd";
 import { useState } from "react";
-import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 
 function BasketNavbar({ handleClose }) {
     const { setitems, items, delFromBasket, changePieceFromBasket } =
@@ -142,7 +141,6 @@ function BasketNavbar({ handleClose }) {
                         </Button>
                         <Button
                             className="ms-3"
-                            type="primary"
                             onClick={() => {
                                 formik.setFieldValue("status", 1);
                                 formik.handleSubmit();
