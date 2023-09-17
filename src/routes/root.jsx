@@ -17,6 +17,8 @@ import BasketNavbar from "../components/Basket";
 import { useEffect, useState } from "react";
 import { useBasket } from "../contexts/BasketContext";
 import { useToast } from "../contexts/ToastContext";
+import { ConfigProvider, FloatButton } from "antd";
+import { ShoppingCartOutlined } from "@ant-design/icons";
 
 export default function Root() {
     const { logout, user } = useAuth();
@@ -94,16 +96,10 @@ export default function Root() {
                                     <NavLink className="nav-link" to="/">
                                         Anasayfa
                                     </NavLink>
-                                    <NavLink
-                                        className="nav-link"
-                                        to="/orders"
-                                    >
+                                    <NavLink className="nav-link" to="/orders">
                                         Siparişler
                                     </NavLink>
-                                    <NavLink
-                                        className="nav-link"
-                                        to="/account"
-                                    >
+                                    <NavLink className="nav-link" to="/account">
                                         Hesap Dökümü
                                     </NavLink>
                                 </Nav>
@@ -122,14 +118,16 @@ export default function Root() {
                                         </Button>
                                     )}
                                     <NavDropdown
-                                        title={ user && user.company_name}
+                                        title={user && user.company_name}
                                         id="collasible-nav-dropdown"
                                     >
                                         <NavDropdown.Item>
                                             Hesabım
                                         </NavDropdown.Item>
                                         <NavDropdown.Divider />
-                                        <NavDropdown.Item onClick={handleLogout}>
+                                        <NavDropdown.Item
+                                            onClick={handleLogout}
+                                        >
                                             Çıkış
                                         </NavDropdown.Item>
                                     </NavDropdown>
@@ -173,6 +171,29 @@ export default function Root() {
                         <Toast.Body className="h5">{toastInfo.text}</Toast.Body>
                     </Toast>
                 </ToastContainer>
+                {items.length != 0 && (
+                    <ConfigProvider
+                        theme={{
+                            token: {
+                                colorPrimary: "red",
+                                fontSizeIcon: 20,
+                            },
+                        }}
+                    >
+                        <FloatButton
+                            badge={{
+                                count: items.length,
+                                align: "left",
+                                color: "purple",
+                            }}
+                            tooltip={<div>Sepetim</div>}
+                            icon={<ShoppingCartOutlined />}
+                            type="primary"
+                            onClick={basketShowHandle}
+                            style={{ width: 60, height: 60 }}
+                        />
+                    </ConfigProvider>
+                )}
             </Container>
         </>
     );

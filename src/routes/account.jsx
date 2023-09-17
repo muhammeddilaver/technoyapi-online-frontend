@@ -88,7 +88,7 @@ function Account() {
         <Container style={{ marginTop: 80 }}>
             <Row>
                 <h2>Hesap Dökümü</h2>
-                <Table
+                <Table className="flex-nowrap overflow-auto"
                     loading={isLoading}
                     onRow={(record) => {
                         return {

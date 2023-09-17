@@ -53,6 +53,9 @@ function UserList({ userKeyword }) {
         <Table
             loading={status === "loading"}
             style={{ marginTop: "10px" }}
+            scroll={{
+                x: "100vw",
+            }}
             /* onRow={(record) => {
                         return {
                             onClick: () => {
