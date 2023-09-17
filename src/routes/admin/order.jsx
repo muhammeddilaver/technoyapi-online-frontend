@@ -1,5 +1,5 @@
 import { Button, Container, Form, Row, Table } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -19,7 +19,8 @@ import {
     neworderValidations,
     shortOrderAdminValidations,
 } from "../../validations/yup";
-import { ConfigProvider, Spin } from "antd";
+import { Breadcrumb, ConfigProvider, Descriptions, Space, Spin } from "antd";
+import Title from "antd/es/typography/Title";
 
 function OrderAdmin() {
     const { order_id } = useParams();
@@ -31,6 +32,7 @@ function OrderAdmin() {
     const [isSpin, setisSpin] = useState(false);
     const [validationSchema, setValidationSchema] =
         useState(neworderValidations);
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -256,10 +258,6 @@ function OrderAdmin() {
         );
     }
 
-    if (isError) {
-        return <div>Sipariş bulunamadı</div>;
-    }
-
     const orderStatusMessage = (status) => {
         switch (status) {
             case 1:
@@ -278,6 +276,40 @@ function OrderAdmin() {
                 return "Sipariş iptal edildi";
         }
     };
+
+    const descriptionInfos = [
+        {
+            key: "1",
+            label: "Alıcı Firma",
+            children: formik.values.client.name + " " + formik.values.client.company_name,
+        },
+        {
+            key: "2",
+            label: "Sipariş Tarihi",
+            children: moment(formik.values.order_date).format("DD.MM.YYYY HH:mm"),
+        },
+        {
+            key: "3",
+            label: "Açıklama",
+            children: formik.values.description,
+        },
+        {
+            key: "4",
+            label: "Teslimat Tarihi",
+            children:
+                formik.values.delivery_date &&
+                moment(formik.values.delivery_date).format("DD.MM.YYYY HH:mm"),
+        },
+        {
+            key: "5",
+            label: "Durum",
+            children: orderStatusMessage(formik.values.status),
+        },
+    ];
+
+    if (isError) {
+        return <div>Sipariş bulunamadı</div>;
+    }
 
     const handleReturn = (product, orderId) => {
         const returnCount = prompt(
@@ -359,42 +391,27 @@ function OrderAdmin() {
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
-                <Table striped responsive bordered hover>
-                    <tbody>
-                        <tr>
-                            <td>Alıcı Firma</td>
-                            <td>{formik.values.client.company_name}</td>
-                        </tr>
-                        <tr>
-                            <td>Sipariş Tarihi</td>
-                            <td>
-                                {moment(formik.values.order_date).format(
-                                    "DD.MM.YYYY HH:mm"
-                                )}
-                            </td>
-                        </tr>
-                        {formik.values.delivery_date && (
-                            <tr>
-                                <td>Teslimat Tarihi</td>
-                                <td>
-                                    {moment(formik.values.delivery_date).format(
-                                        "DD.MM.YYYY HH:mm"
-                                    )}
-                                </td>
-                            </tr>
-                        )}
-                        <tr>
-                            <td>Açıklama</td>
-                            <td>{formik.values.description}</td>
-                        </tr>
-                        <tr>
-                            <td>Durum</td>
-                            <td>{orderStatusMessage(formik.values.status)}</td>
-                        </tr>
-                    </tbody>
-                </Table>
+                <Breadcrumb
+                    items={[
+                        {
+                            title: (
+                                <a onClick={() => navigate(`/admin`)}>Tüm Siparişler</a>
+                            ),
+                        },
+                        {
+                            title: "Sipariş detay",
+                        },
+                    ]}
+                />
             </Row>
-            <Row>
+            <Row className="mt-3">
+                <Descriptions
+                    title="Sipariş Bilgileri"
+                    bordered
+                    items={descriptionInfos}
+                />
+            </Row>
+            <Row className="mt-4">
                 <ConfigProvider
                     theme={{
                         token: {
@@ -404,9 +421,11 @@ function OrderAdmin() {
                     }}
                 >
                     <Spin spinning={isSpin} size="large">
-                        <p>
-                            <b>Siparişler:</b>
-                        </p>
+                        <Space>
+                            <Title level={5} strong>
+                                Siparişler
+                            </Title>
+                        </Space>
                         {(formik.values.status === 1 ||
                             formik.values.status === 3) && (
                             <Form.Group
@@ -433,9 +452,9 @@ function OrderAdmin() {
 
                         <Form noValidate onSubmit={formik.handleSubmit}>
                             <Table
-                                striped
+                                
                                 responsive
-                                bordered
+                                
                                 hover
                                 style={{ minWidth: 900 }}
                             >

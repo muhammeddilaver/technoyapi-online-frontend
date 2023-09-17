@@ -1,5 +1,5 @@
 import { Container, Row } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { format } from "number-currency-format-2";
 import { useInView } from "react-intersection-observer";
@@ -86,14 +86,6 @@ function AdminHome() {
             },
         },
         {
-            title: "Ürün Adedi",
-            dataIndex: "products_count",
-            key: "products_count",
-            render: (text, record) => {
-                return record.products.length;
-            },
-        },
-        {
             title: "Tutar",
             dataIndex: "total_price",
             key: "total_price",
@@ -168,7 +160,7 @@ function AdminHome() {
                                 size="large"
                                 danger
                                 type="primary"
-                                onClick={() => navigate(`/admin/new_order"`)}
+                                onClick={() => navigate(`/admin/new_order`)}
                             >
                                 Yeni Sipariş
                             </Button>
@@ -224,88 +216,6 @@ function AdminHome() {
                         </span>
                     </div>
                 </Row>
-                {/* <Table responsive bordered>
-                    <thead>
-                        <tr>
-                            <th>Müşteri adı</th>
-                            <th>Sipariş Tarihi</th>
-                            <th>Ürün Sayısı</th>
-                            <th>Tutar</th>
-                            <th>Açıklama</th>
-                            <th>Teslimat Tarihi</th>
-                            <th>Durum</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.pages.map((page, pageIndex) => (
-                            <React.Fragment key={pageIndex}>
-                                {page.map((order, orderIndex) => (
-                                    <tr
-                                        onClick={() => handleRowClick(order)}
-                                        className={
-                                            order.status === 7
-                                                ? "table-danger"
-                                                : order.status === 6
-                                                ? "table-success"
-                                                : order.status === 1 ||
-                                                  order.status === 3
-                                                ? "table-warning"
-                                                : "table-info"
-                                        }
-                                        key={orderIndex}
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        <td>{order.client.company_name}</td>
-                                        <td>
-                                            {moment(order.order_date).format(
-                                                "DD.MM.YYYY HH:mm"
-                                            )}
-                                        </td>
-                                        <td>{order.products.length}</td>
-                                        <td>
-                                            {format(order.total_price, {
-                                                currency: "₺",
-                                                decimalSeparator: ",",
-                                                thousandSeparator: ".",
-                                            })}
-                                        </td>
-                                        <td>{order.description}</td>
-                                        <td>
-                                            {order.delivery_date &&
-                                                moment(
-                                                    order.delivery_date
-                                                ).format("DD.MM.YYYY HH:mm")}
-                                        </td>
-                                        <td>
-                                            {orderStatusMessage(order.status)}
-                                        </td>
-                                        <td>
-                                            <Link
-                                                className="btn btn-primary"
-                                                to={order._id}
-                                            >
-                                                <i className="fa fa-search"></i>
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </React.Fragment>
-                        ))}
-                    </tbody>
-                </Table>
-                <>
-                    <span
-                        ref={ref}
-                        onClick={() => fetchNextPage()}
-                        disabled={!hasNextPage || isFetchingNextPage}
-                        style={{ opacity: 0 }}
-                    >
-                        asdasd
-                    </span>
-                </>
-
-                <>{isFetching && !isFetchingNextPage ? "" : null}</> */}
             </Container>
         </>
     );

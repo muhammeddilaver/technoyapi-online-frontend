@@ -157,14 +157,14 @@ function Order() {
                         Siparişler
                     </Title>
                 </Space>
-                <Table responsive hover>
+                <Table responsive hover style={{ minWidth: 900 }}>
                     <thead>
                         <tr>
-                            <th>Ürün Adı</th>
-                            <th>Adet</th>
-                            <th>Fiyat</th>
-                            <th>Tutar</th>
-                            <th></th>
+                            <th style={{ minWidth: 250 }}>Ürün Adı</th>
+                            <th className="col-lg-2">Adet</th>
+                            <th className="col-lg-2">Fiyat</th>
+                            <th className="col-lg-2">Tutar</th>
+                            <th className="col-lg-2"></th>
                         </tr>
                     </thead>
                     <tbody>
