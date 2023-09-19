@@ -33,6 +33,13 @@ function Order() {
 
     const queryClient = useQueryClient();
 
+    queryClient.setDefaultOptions({
+        queries: {
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+        },
+    });
+
     const offerMutation = useMutation(acceptOrRejectOffer, {
         onSuccess: () => {
             //queryClient.invalidateQueries(["order", order_id]);
@@ -331,6 +338,7 @@ function Order() {
                     </Button>
                 </>
             )}
+            {/* <Button onClick={console.log(data[0])}>Test</Button> */}
         </Container>
     );
 }

@@ -170,6 +170,39 @@ export const createUser = async (user) => {
     return data;
 };
 
+export const createOrderPDF = async (order_id, name, offer) => {
+    const { data } = await axios.get(
+        `${import.meta.env.VITE_BASE_ENDPOINT}/order/${order_id}/pdf/${offer}`, {
+            responseType: 'blob',
+        }
+    );
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${name}-siparis.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(url);
+    return data;
+};
+
+export const createAccountPDF = async (user_id) => {
+    user_id = user_id === undefined ? "" : user_id;
+    const { data } = await axios.get(
+        `${import.meta.env.VITE_BASE_ENDPOINT}/auth/pdf/${user_id}`, {
+            responseType: 'blob',
+        }
+    );
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Hesap-özeti.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(url);
+    return data;
+};
+
 export const createPayment = async (payment) => {
     const { data } = await axios.post(
         `${import.meta.env.VITE_BASE_ENDPOINT}/auth/payment`,

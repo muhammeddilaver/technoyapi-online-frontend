@@ -360,7 +360,7 @@ function NewOrder() {
                                     </td>
                                     <td
                                         style={{
-                                            width: 90,
+                                            width: 110,
                                         }}
                                     >
                                         <Form.Control

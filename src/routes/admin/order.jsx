@@ -4,6 +4,7 @@ import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     addProductToOrder,
+    createOrderPDF,
     currencyRates,
     deleteProductFromOrder,
     fetchAdminSearchList,
@@ -15,7 +16,6 @@ import { useToast } from "../../contexts/ToastContext";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import Select, { components } from "react-select";
-import { Resolution, Margin, usePDF } from "react-to-pdf";
 import {
     neworderValidations,
     shortOrderAdminValidations,
@@ -45,6 +45,13 @@ function OrderAdmin() {
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
+
+    queryClient.setDefaultOptions({
+        queries: {
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+        },
+    });
 
     const {
         isLoading: searchIsLoading,
@@ -253,31 +260,6 @@ function OrderAdmin() {
         );
     }, [formik.values.products]);
 
-    const pdfOptions = {
-        filename: "hesap-ozeti.pdf",
-        method: "save",
-        resolution: Resolution.MEDIUM,
-        page: {
-            margin: Margin.MEDIUM,
-            format: "letter",
-            orientation: "landscape",
-        },
-        canvas: {
-            mimeType: "image/jpeg",
-            qualityRatio: 1,
-        },
-        overrides: {
-            pdf: {
-                compress: true,
-            },
-            canvas: {
-                useCORS: true,
-            },
-        },
-    };
-
-    const { toPDF, targetRef } = usePDF(pdfOptions);
-
     if (isLoading || !data[0]._id) {
         return (
             <ConfigProvider
@@ -431,7 +413,7 @@ function OrderAdmin() {
     };
 
     return (
-        <Container style={{ marginTop: 80 }} ref={targetRef}>
+        <Container style={{ marginTop: 80 }}>
             <Row>
                 <Breadcrumb
                     items={[
@@ -523,9 +505,9 @@ function OrderAdmin() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {formik.values.products.map(
+                                    {data[0].products.map(
                                         (product, key) =>
-                                            data[0].products[key].piece !==
+                                        product.piece !==
                                                 0 && (
                                                 <tr
                                                     key={key}
@@ -602,7 +584,7 @@ function OrderAdmin() {
                                                         <>
                                                             <td
                                                                 style={{
-                                                                    width: 110,
+                                                                    width: 160,
                                                                 }}
                                                             >
                                                                 <Form.Control
@@ -673,7 +655,7 @@ function OrderAdmin() {
                                                             </td>
                                                             <td
                                                                 style={{
-                                                                    width: 80,
+                                                                    width: 120,
                                                                 }}
                                                             >
                                                                 <Form.Select
@@ -779,7 +761,7 @@ function OrderAdmin() {
                                                         </>
                                                     )}
 
-                                                    <td style={{ width: 110 }}>
+                                                    <td style={{ width: 140 }}>
                                                         <Form.Control
                                                             disabled
                                                             type="number"
@@ -818,7 +800,7 @@ function OrderAdmin() {
                                                             }
                                                         />
                                                     </td>
-                                                    <td style={{ width: 110 }}>
+                                                    <td style={{ width: 200 }}>
                                                         <Form.Control
                                                             disabled
                                                             type="number"
@@ -984,30 +966,29 @@ function OrderAdmin() {
                                 </>
                             )}
                             <Space>
-                            {formik.values.status !== 6 && (
-                                <Button
-                                    onClick={formik.handleSubmit}
-                                >
-                                    {formik.values.status === 1 &&
-                                        "Teklif Gönder"}
-                                    {formik.values.status === 2 &&
-                                        "Onay Bekleniyor"}
-                                    {formik.values.status === 3 &&
-                                        "Siparişi Al"}
-                                    {formik.values.status === 4 &&
-                                        "Teslimata Gönder"}
-                                    {formik.values.status === 5 && "Teslim Et"}
-                                </Button>
-                            )}
-                            {(formik.values.status !== 1 &&
-                                formik.values.status !== 3) && (
-                                <Button
-                                    icon={<PrinterOutlined />}
-                                    onClick={() => toPDF()}
-                                >
-                                    Çıktı al
-                                </Button>
-                            )}
+                                {formik.values.status !== 6 && (
+                                    <Button onClick={formik.handleSubmit}>
+                                        {formik.values.status === 1 &&
+                                            "Teklif Gönder"}
+                                        {formik.values.status === 2 &&
+                                            "Müşteri Onayı Bekleniyor. Beklemeden kendiniz onaylamak için tıklayınız"}
+                                        {formik.values.status === 3 &&
+                                            "Siparişi Al"}
+                                        {formik.values.status === 4 &&
+                                            "Teslimata Gönder"}
+                                        {formik.values.status === 5 &&
+                                            "Teslim Et"}
+                                    </Button>
+                                )}
+                                {formik.values.status !== 1 &&
+                                    formik.values.status !== 3 && (
+                                        <Button
+                                            icon={<PrinterOutlined />}
+                                            onClick={() => createOrderPDF(formik.values._id, formik.values.client.name, (formik.values.status === 2 ? 1 : 0))}
+                                        >
+                                            Çıktı al
+                                        </Button>
+                                    )}
                             </Space>
                             {/* <Button onClick={() => console.log(formik.values)}>
                         Test

@@ -1,13 +1,12 @@
 import { Alert, Container, Row } from "react-bootstrap";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createPayment, fetchAccount, getBalance, userFetch } from "../../api";
+import { createAccountPDF, createPayment, fetchAccount, getBalance, userFetch } from "../../api";
 import { format } from "number-currency-format-2";
 import { useNavigate, useParams } from "react-router-dom";
 import { Breadcrumb, Button, Form, Input, Modal, Space, Table } from "antd";
 import { useState } from "react";
 import { useToast } from "../../contexts/ToastContext";
-import { Resolution, Margin, usePDF } from "react-to-pdf";
 import Title from "antd/es/typography/Title";
 
 function UserAccount() {
@@ -143,31 +142,6 @@ function UserAccount() {
         },
     ];
 
-    const pdfOptions = {
-        filename: "hesap-ozeti.pdf",
-        method: "save",
-        resolution: Resolution.MEDIUM,
-        page: {
-            margin: Margin.MEDIUM,
-            format: "letter",
-            orientation: "landscape",
-        },
-        canvas: {
-            mimeType: "image/jpeg",
-            qualityRatio: 1,
-        },
-        overrides: {
-            pdf: {
-                compress: true,
-            },
-            canvas: {
-                useCORS: true,
-            },
-        },
-    };
-
-    const { toPDF, targetRef } = usePDF(pdfOptions);
-
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
@@ -201,7 +175,7 @@ function UserAccount() {
                     <Button
                         type="primary"
                         className="mb-3"
-                        onClick={() => toPDF()}
+                        onClick={() => createAccountPDF(user_id)}
                     >
                         Çıktı al
                     </Button>
@@ -278,7 +252,6 @@ function UserAccount() {
             </Row>
             <Row className="flex-nowrap overflow-auto">
                 <Table
-                    ref={targetRef}
                     loading={isLoading}
                     onRow={(record) => {
                         return {
