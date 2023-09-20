@@ -483,24 +483,24 @@ function OrderAdmin() {
                                         <th style={(data[0].status === 1 || data[0].status === 3) ? {minWidth: 250} : {width: 250} }>
                                             Ürün Adı
                                         </th>
-                                        <th style={!(data[0].status === 1 || data[0].status === 3) ? {width: 110} : {} } className="col-lg-2">Adet</th>
+                                        <th style={(data[0].status === 1 || data[0].status === 3) ? {minWidth: 110} : {width: 110} } className="col-lg-2">Adet</th>
                                         {(formik.values.status === 1 ||
                                             formik.values.status === 3) && (
                                             <>
-                                                <th className="col-lg-2">
+                                                <th style={{minWidth: 130}} className="col-lg-2">
                                                     Ham Fiyat
                                                 </th>
-                                                <th className="col-lg-2">
+                                                <th style={{minWidth: 120}} className="col-lg-2">
                                                     Para Birimi
                                                 </th>
-                                                <th className="col-lg-2">
+                                                <th style={{minWidth: 120}} className="col-lg-2">
                                                     Çarpan
                                                 </th>
                                             </>
                                         )}
 
-                                        <th style={!(data[0].status === 1 || data[0].status === 3) ? {width: 140} : {} } className="col-lg-2">Fiyat (TL)</th>
-                                        <th style={!(data[0].status === 1 || data[0].status === 3) ? {width: 150} : {} } className="col-lg-2">Tutar (TL)</th>
+                                        <th style={(data[0].status === 1 || data[0].status === 3) ? { minWidth: 120} : {width: 140} } className="col-lg-2">Fiyat (TL)</th>
+                                        <th style={(data[0].status === 1 || data[0].status === 3) ? { minWidth: 135} : {width: 150} } className="col-lg-2">Tutar (TL)</th>
                                         <th></th>
                                     </tr>
                                 </thead>
