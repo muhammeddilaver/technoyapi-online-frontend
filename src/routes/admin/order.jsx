@@ -1,4 +1,4 @@
-import { Container, Form, Row, Table } from "react-bootstrap";
+import { Col, Container, Form, Row, Table } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -507,8 +507,7 @@ function OrderAdmin() {
                                 <tbody>
                                     {data[0].products.map(
                                         (product, key) =>
-                                        product.piece !==
-                                                0 && (
+                                            product.piece !== 0 && (
                                                 <tr
                                                     key={key}
                                                     className={
@@ -965,37 +964,44 @@ function OrderAdmin() {
                                     </Table>
                                 </>
                             )}
-                            <Space>
-                                {formik.values.status !== 6 && (
-                                    <Button onClick={formik.handleSubmit}>
-                                        {formik.values.status === 1 &&
-                                            "Teklif Gönder"}
-                                        {formik.values.status === 2 &&
-                                            "Müşteri Onayı Bekleniyor. Beklemeden kendiniz onaylamak için tıklayınız"}
-                                        {formik.values.status === 3 &&
-                                            "Siparişi Al"}
-                                        {formik.values.status === 4 &&
-                                            "Teslimata Gönder"}
-                                        {formik.values.status === 5 &&
-                                            "Teslim Et"}
-                                    </Button>
-                                )}
-                                {formik.values.status !== 1 &&
-                                    formik.values.status !== 3 && (
-                                        <Button
-                                            icon={<PrinterOutlined />}
-                                            onClick={() => createOrderPDF(formik.values._id, formik.values.client.name, (formik.values.status === 2 ? 1 : 0))}
-                                        >
-                                            Çıktı al
-                                        </Button>
-                                    )}
-                            </Space>
-                            {/* <Button onClick={() => console.log(formik.values)}>
-                        Test
-                    </Button> */}
                         </Form>
                     </Spin>
                 </ConfigProvider>
+            </Row>
+            <Row>
+                <Col md={12}>
+                    <Space>
+                        {formik.values.status !== 6 && (
+                            <Button onClick={formik.handleSubmit}>
+                                {formik.values.status === 1 && "Teklif Gönder"}
+                                {formik.values.status === 2 &&
+                                    "Müşteri Onayı Bekleniyor. Beklemeden kendiniz onaylamak için tıklayınız"}
+                                {formik.values.status === 3 && "Siparişi Al"}
+                                {formik.values.status === 4 &&
+                                    "Teslimata Gönder"}
+                                {formik.values.status === 5 && "Teslim Et"}
+                            </Button>
+                        )}
+                        {formik.values.status !== 1 &&
+                            formik.values.status !== 3 && (
+                                <Button
+                                    icon={<PrinterOutlined />}
+                                    onClick={() =>
+                                        createOrderPDF(
+                                            formik.values._id,
+                                            formik.values.client.name,
+                                            formik.values.status === 2 ? 1 : 0
+                                        )
+                                    }
+                                >
+                                    Çıktı al
+                                </Button>
+                            )}
+                    </Space>
+                    {/* <Button onClick={() => console.log(formik.values)}>
+                        Test
+                    </Button> */}
+                </Col>
             </Row>
         </Container>
     );
