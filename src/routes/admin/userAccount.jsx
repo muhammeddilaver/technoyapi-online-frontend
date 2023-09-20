@@ -8,6 +8,7 @@ import { Breadcrumb, Button, Form, Input, Modal, Space, Table } from "antd";
 import { useState } from "react";
 import { useToast } from "../../contexts/ToastContext";
 import Title from "antd/es/typography/Title";
+import { PrinterOutlined } from "@ant-design/icons";
 
 function UserAccount() {
     const navigate = useNavigate();
@@ -173,8 +174,7 @@ function UserAccount() {
                         Hesap Dökümü
                     </Title>
                     <Button
-                        type="primary"
-                        className="mb-3"
+                        icon={<PrinterOutlined />}
                         onClick={() => createAccountPDF(user_id)}
                     >
                         Çıktı al

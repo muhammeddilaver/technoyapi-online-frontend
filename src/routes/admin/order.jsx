@@ -1,4 +1,4 @@
-import { Col, Container, Form, Row, Table } from "react-bootstrap";
+import { Container, Form, Row, Table } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -480,10 +480,10 @@ function OrderAdmin() {
                             <Table responsive hover style={{ minWidth: 900 }}>
                                 <thead>
                                     <tr>
-                                        <th style={{ minWidth: 250 }}>
+                                        <th style={(data[0].status === 1 || data[0].status === 3) ? {minWidth: 250} : {width: 250} }>
                                             Ürün Adı
                                         </th>
-                                        <th className="col-lg-2">Adet</th>
+                                        <th style={!(data[0].status === 1 || data[0].status === 3) ? {width: 110} : {} } className="col-lg-2">Adet</th>
                                         {(formik.values.status === 1 ||
                                             formik.values.status === 3) && (
                                             <>
@@ -499,15 +499,16 @@ function OrderAdmin() {
                                             </>
                                         )}
 
-                                        <th className="col-lg-2">Fiyat (TL)</th>
-                                        <th className="col-lg-2">Tutar (TL)</th>
+                                        <th style={!(data[0].status === 1 || data[0].status === 3) ? {width: 140} : {} } className="col-lg-2">Fiyat (TL)</th>
+                                        <th style={!(data[0].status === 1 || data[0].status === 3) ? {width: 150} : {} } className="col-lg-2">Tutar (TL)</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {data[0].products.map(
                                         (product, key) =>
-                                            product.piece !== 0 && (
+                                        product.piece !==
+                                                0 && (
                                                 <tr
                                                     key={key}
                                                     className={
@@ -539,7 +540,7 @@ function OrderAdmin() {
                                                             />
                                                         )}
                                                     </td>
-                                                    <td style={{ width: 140 }}>
+                                                    <td >
                                                         <Form.Control
                                                             name={`products.${key}.piece`}
                                                             isValid={
@@ -760,7 +761,7 @@ function OrderAdmin() {
                                                         </>
                                                     )}
 
-                                                    <td style={{ width: 140 }}>
+                                                    <td>
                                                         <Form.Control
                                                             disabled
                                                             type="number"
@@ -795,11 +796,11 @@ function OrderAdmin() {
                                                                 formik.values
                                                                     .products?.[
                                                                     key
-                                                                ]?.price
+                                                                ]?.price.toFixed(2)
                                                             }
                                                         />
                                                     </td>
-                                                    <td style={{ width: 200 }}>
+                                                    <td>
                                                         <Form.Control
                                                             disabled
                                                             type="number"
@@ -830,11 +831,14 @@ function OrderAdmin() {
                                                             onBlur={
                                                                 formik.handleBlur
                                                             }
-                                                            value={
+                                                            value={formik.values
+                                                                .products?.[
+                                                                key
+                                                            ]?.last_price &&
                                                                 formik.values
                                                                     .products?.[
                                                                     key
-                                                                ]?.last_price
+                                                                ]?.last_price.toFixed(2)
                                                             }
                                                         />
                                                     </td>
@@ -907,7 +911,7 @@ function OrderAdmin() {
                                             <Form.Control
                                                 disabled
                                                 type="number"
-                                                value={totalPrice}
+                                                value={totalPrice.toFixed(2)}
                                                 onChange={formik.handleChange}
                                                 name={`total_price`}
                                                 onBlur={formik.handleBlur}
@@ -964,44 +968,37 @@ function OrderAdmin() {
                                     </Table>
                                 </>
                             )}
+                            <Space>
+                                {formik.values.status !== 6 && (
+                                    <Button onClick={formik.handleSubmit}>
+                                        {formik.values.status === 1 &&
+                                            "Teklif Gönder"}
+                                        {formik.values.status === 2 &&
+                                            "Onay bekleniyor"}
+                                        {formik.values.status === 3 &&
+                                            "Siparişi Al"}
+                                        {formik.values.status === 4 &&
+                                            "Teslimata Gönder"}
+                                        {formik.values.status === 5 &&
+                                            "Teslim Et"}
+                                    </Button>
+                                )}
+                                {formik.values.status !== 1 &&
+                                    formik.values.status !== 3 && (
+                                        <Button
+                                            icon={<PrinterOutlined />}
+                                            onClick={() => createOrderPDF(formik.values._id, formik.values.client.name, (formik.values.status === 2 ? 1 : 0))}
+                                        >
+                                            Çıktı al
+                                        </Button>
+                                    )}
+                            </Space>
+                            {/* <Button onClick={() => console.log(formik.values)}>
+                        Test
+                    </Button> */}
                         </Form>
                     </Spin>
                 </ConfigProvider>
-            </Row>
-            <Row>
-                <Col md={12}>
-                    <Space>
-                        {formik.values.status !== 6 && (
-                            <Button onClick={formik.handleSubmit}>
-                                {formik.values.status === 1 && "Teklif Gönder"}
-                                {formik.values.status === 2 &&
-                                    "Müşteri Onayı Bekleniyor. Beklemeden kendiniz onaylamak için tıklayınız"}
-                                {formik.values.status === 3 && "Siparişi Al"}
-                                {formik.values.status === 4 &&
-                                    "Teslimata Gönder"}
-                                {formik.values.status === 5 && "Teslim Et"}
-                            </Button>
-                        )}
-                        {formik.values.status !== 1 &&
-                            formik.values.status !== 3 && (
-                                <Button
-                                    icon={<PrinterOutlined />}
-                                    onClick={() =>
-                                        createOrderPDF(
-                                            formik.values._id,
-                                            formik.values.client.name,
-                                            formik.values.status === 2 ? 1 : 0
-                                        )
-                                    }
-                                >
-                                    Çıktı al
-                                </Button>
-                            )}
-                    </Space>
-                    {/* <Button onClick={() => console.log(formik.values)}>
-                        Test
-                    </Button> */}
-                </Col>
             </Row>
         </Container>
     );
