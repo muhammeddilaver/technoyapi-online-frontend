@@ -158,10 +158,31 @@ function NewOrder() {
         ]);
     };
 
+    const normalizeText = (text) => {
+        text = text
+          .replace(/ı/g, 'i')
+          .replace(/I/g, 'i')
+          .replace(/İ/g, 'i')
+          .replace(/ş/g, 's')
+          .replace(/Ş/g, 's')
+          .replace(/ç/g, 'c')
+          .replace(/Ç/g, 'c')
+          .replace(/ğ/g, 'g')
+          .replace(/Ğ/g, 'g')
+          .replace(/ü/g, 'u')
+          .replace(/Ü/g, 'u')
+          .replace(/ö/g, 'o')
+          .replace(/Ö/g, 'o');
+        text = text.toLowerCase();
+        return text;
+      };
+
+
     const productOptions =
         productData?.map((data) => ({
             value: data,
             label: data.name,
+            normalizedLabel: normalizeText(data.name),
         })) || [];
 
     const msgStyles = {
@@ -179,6 +200,8 @@ function NewOrder() {
         );
     };
 
+   
+      
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
@@ -239,6 +262,8 @@ function NewOrder() {
                     <Form.Group className="mb-3">
                         <Form.Label>Ürün Ekle:</Form.Label>
                         <Select
+                            isClearable
+                            isSearchable
                             value={productKeyword}
                             components={{ NoOptionsMessage }}
                             styles={{
@@ -247,12 +272,20 @@ function NewOrder() {
                                     ...msgStyles,
                                 }),
                             }}
+                            filterOption={(option, inputValue) =>
+                                {
+                                    return option.data.normalizedLabel.includes(
+                                        normalizeText(inputValue)
+                                    )
+                                }
+                            }
                             onChange={handleProductSearchChange}
                             onInputChange={handleProductInputChange}
                             options={productOptions}
                             placeholder="Eklemek istediğiniz ürünü giriniz."
                         />
                     </Form.Group>
+
                     <Table
                         striped
                         responsive

@@ -366,10 +366,30 @@ function OrderAdmin() {
         }
     };
 
+    const normalizeText = (text) => {
+        text = text
+          .replace(/ı/g, 'i')
+          .replace(/I/g, 'i')
+          .replace(/İ/g, 'i')
+          .replace(/ş/g, 's')
+          .replace(/Ş/g, 's')
+          .replace(/ç/g, 'c')
+          .replace(/Ç/g, 'c')
+          .replace(/ğ/g, 'g')
+          .replace(/Ğ/g, 'g')
+          .replace(/ü/g, 'u')
+          .replace(/Ü/g, 'u')
+          .replace(/ö/g, 'o')
+          .replace(/Ö/g, 'o');
+        text = text.toLowerCase();
+        return text;
+      };
+
     const options =
         searchData?.map((data) => ({
             value: data,
             label: data.name,
+            normalizedLabel: normalizeText(data.name),
         })) || [];
 
     const newProduct = (name) => {
@@ -468,6 +488,13 @@ function OrderAdmin() {
                                             ...msgStyles,
                                         }),
                                     }}
+                                    filterOption={(option, inputValue) =>
+                                        {
+                                            return option.data.normalizedLabel.includes(
+                                                normalizeText(inputValue)
+                                            )
+                                        }
+                                    }
                                     onChange={handleSearchChange}
                                     onInputChange={handleInputChange}
                                     options={options}
