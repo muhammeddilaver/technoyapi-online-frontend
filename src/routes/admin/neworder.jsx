@@ -160,23 +160,22 @@ function NewOrder() {
 
     const normalizeText = (text) => {
         text = text
-          .replace(/ı/g, 'i')
-          .replace(/I/g, 'i')
-          .replace(/İ/g, 'i')
-          .replace(/ş/g, 's')
-          .replace(/Ş/g, 's')
-          .replace(/ç/g, 'c')
-          .replace(/Ç/g, 'c')
-          .replace(/ğ/g, 'g')
-          .replace(/Ğ/g, 'g')
-          .replace(/ü/g, 'u')
-          .replace(/Ü/g, 'u')
-          .replace(/ö/g, 'o')
-          .replace(/Ö/g, 'o');
+            .replace(/ı/g, "i")
+            .replace(/I/g, "i")
+            .replace(/İ/g, "i")
+            .replace(/ş/g, "s")
+            .replace(/Ş/g, "s")
+            .replace(/ç/g, "c")
+            .replace(/Ç/g, "c")
+            .replace(/ğ/g, "g")
+            .replace(/Ğ/g, "g")
+            .replace(/ü/g, "u")
+            .replace(/Ü/g, "u")
+            .replace(/ö/g, "o")
+            .replace(/Ö/g, "o");
         text = text.toLowerCase();
         return text;
-      };
-
+    };
 
     const productOptions =
         productData?.map((data) => ({
@@ -200,8 +199,6 @@ function NewOrder() {
         );
     };
 
-   
-      
     return (
         <Container style={{ marginTop: 80 }}>
             <Row>
@@ -272,13 +269,11 @@ function NewOrder() {
                                     ...msgStyles,
                                 }),
                             }}
-                            filterOption={(option, inputValue) =>
-                                {
-                                    return option.data.normalizedLabel.includes(
-                                        normalizeText(inputValue)
-                                    )
-                                }
-                            }
+                            filterOption={(option, inputValue) => {
+                                return option.data.normalizedLabel.includes(
+                                    normalizeText(inputValue)
+                                );
+                            }}
                             onChange={handleProductSearchChange}
                             onInputChange={handleProductInputChange}
                             options={productOptions}
@@ -330,6 +325,7 @@ function NewOrder() {
                                                 formik.values.products?.[key]
                                                     ?.piece
                                             }
+                                            autoComplete="off"
                                         />
                                     </td>
                                     <td
@@ -358,6 +354,7 @@ function NewOrder() {
                                                 formik.values.products?.[key]
                                                     ?.exact_price
                                             }
+                                            autoComplete="off"
                                         />
                                     </td>
                                     <td
@@ -416,6 +413,7 @@ function NewOrder() {
                                                 formik.values.products?.[key]
                                                     ?.factor
                                             }
+                                            autoComplete="off"
                                         />
                                     </td>
 
@@ -442,6 +440,7 @@ function NewOrder() {
                                                 formik.values.products?.[key]
                                                     ?.price
                                             }
+                                            autoComplete="off"
                                         />
                                     </td>
                                     <td style={{ width: 200 }}>
@@ -467,6 +466,7 @@ function NewOrder() {
                                                 formik.values.products?.[key]
                                                     ?.last_price
                                             }
+                                            autoComplete="off"
                                         />
                                     </td>
                                     <td>
@@ -525,7 +525,8 @@ function NewOrder() {
                                 formik.errors.description
                             }
                             value={formik.values.description || ""}
-                        ></Form.Control>
+                            autoComplete="off"
+                        />
                     </Form.Group>
                     <Button type="submit">Sipariş Oluştur</Button>
                     {/* <Button onClick={() => console.log(formik.values)}>

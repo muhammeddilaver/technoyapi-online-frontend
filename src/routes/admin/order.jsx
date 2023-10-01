@@ -564,6 +564,7 @@ function OrderAdmin() {
                                                                     ]?.name ||
                                                                     ""
                                                                 }
+                                                                autoComplete="off"
                                                             />
                                                         )}
                                                     </td>
@@ -602,6 +603,7 @@ function OrderAdmin() {
                                                                     key
                                                                 ]?.piece
                                                             }
+                                                            autoComplete="off"
                                                         />
                                                     </td>
                                                     {(formik.values.status ===
@@ -678,6 +680,7 @@ function OrderAdmin() {
                                                                         ]
                                                                             ?.exact_price
                                                                     }
+                                                                    autoComplete="off"
                                                                 />
                                                             </td>
                                                             <td
@@ -783,6 +786,7 @@ function OrderAdmin() {
                                                                         ]
                                                                             ?.factor
                                                                     }
+                                                                    autoComplete="off"
                                                                 />
                                                             </td>
                                                         </>
@@ -825,6 +829,7 @@ function OrderAdmin() {
                                                                     key
                                                                 ]?.price.toFixed(2)
                                                             }
+                                                            autoComplete="off"
                                                         />
                                                     </td>
                                                     <td>
@@ -867,6 +872,7 @@ function OrderAdmin() {
                                                                     key
                                                                 ]?.last_price.toFixed(2)
                                                             }
+                                                            autoComplete="off"
                                                         />
                                                     </td>
                                                     <td>
